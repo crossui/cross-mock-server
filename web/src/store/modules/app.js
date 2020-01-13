@@ -2,6 +2,7 @@ import { otherRouter, menuRouter } from '@/router/router';
 import Util from '@/libs/util';
 import { hasOneOf } from '@/libs/tools';
 
+import Cookies from "js-cookie";
 
 const app = {
     state: {
@@ -34,16 +35,16 @@ const app = {
         updateMenulist(state) { //设置左侧导航
             let menuList = [];
             menuRouter.forEach((item, index) => {
-                if (item.show) {
+                if (item.show && hasOneOf(item.roles, Cookies.get('roles'))) {
                     if (item.children.length === 1) {
-                        if (item.children[0].show) {
+                        if (item.children[0].show && hasOneOf(item.roles, Cookies.get('roles'))) {
                             menuList.push(item);
                         }
                     } else {
                         let len = menuList.push(item);
                         let childrenArr = [];
                         childrenArr = item.children.filter(child => {
-                            if (child.show) {
+                            if (child.show && hasOneOf(item.roles, Cookies.get('roles'))) {
                                 return child;
                             }
                         });

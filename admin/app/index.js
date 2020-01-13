@@ -5,7 +5,8 @@ const error = require('koa-json-error'); // 进行错误处理并返回JSON格�
 const parameter = require('koa-parameter'); //进行检验请求体格式是否正确
 const path = require('path'); // path 模块提供了一些用于处理文件路径的小工具
 const routing = require('./routes'); //路由
-//const { connectionStr } = require('./config'); //配置信息
+var cors = require('koa2-cors'); //跨域处理
+const { database } = require('./config'); //配置信息
 
 const app = new Koa();
 
@@ -18,6 +19,7 @@ app.use(error({
     postFormat: (e, { stack, ...rest }) => process.env.NODE_ENV === 'production' ? rest : { stack, ...rest }
 }));
 
+
 //注册 POST请求体
 app.use(koaBody({
     multipart: true, //支持上传文件
@@ -26,9 +28,10 @@ app.use(koaBody({
         keepExtensions: true, // 保留扩展名
     },
 }));
-//
+//进行检验请求体格式是否正确
 app.use(parameter(app));
 
+app.use(cors());
 //解析路由
 routing(app);
 //app运行在8033端口

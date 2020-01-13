@@ -18,6 +18,10 @@
             </v-button-group>
           </div>
         </template>
+
+        <template slot="verify" slot-scope="text, record, index">
+          <div class="user-row-verify">{{record.verify == "1" ? '通过' : "不通过"}}</div>
+        </template>
       </v-table>
     </v-card>
 
@@ -32,6 +36,12 @@
         <v-form-item label="密码" prop="password">
           <v-input type="password" v-model="formValidate.password" />
         </v-form-item>
+        <v-form-item label="状态" prop="verify">
+          <v-radio-group name="radioGroup" v-model="formValidate.verify">
+            <v-radio value="1">通过</v-radio>
+            <v-radio value="2">不通过</v-radio>
+          </v-radio-group>
+        </v-form-item>
       </v-form>
     </v-modal>
   </div>
@@ -45,7 +55,8 @@ export default {
       formValidate: {
         username: "",
         account: "",
-        password: ""
+        password: "",
+        verify: false
       },
       ruleValidate: {
         account: [
@@ -66,7 +77,6 @@ export default {
         ],
         password: [
           {
-            required: true,
             min: 6,
             message: "不能为空,最少6位",
             trigger: "blur"
@@ -74,7 +84,15 @@ export default {
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ]
       },
-      data: [{ uid: 1, username: "11111", account: "faf" }],
+      data: [
+        {
+          uid: 1,
+          username: "11111",
+          account: "faf",
+          verify: "1",
+          createtime: "2019-12-15 14:24"
+        }
+      ],
       pagination: {},
       loading: false,
       columns: [
@@ -92,6 +110,17 @@ export default {
         {
           title: "姓名",
           dataIndex: "username",
+          align: "center"
+        },
+        {
+          title: "状态",
+          dataIndex: "verify",
+          scopedSlots: { customRender: "verify" },
+          align: "center"
+        },
+        {
+          title: "创建时间",
+          dataIndex: "createtime",
           align: "center"
         },
         {

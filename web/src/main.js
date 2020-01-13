@@ -3,14 +3,13 @@ import App from './App'
 import Vcu from 'vcu'
 import { router } from './router/index'
 import store from './store';
-import { requestAjax, Http } from '@/service';
+import request from '@/libs/request';
 import 'babel-polyfill'
 
 
 Vue.use(Vcu)
 
-Vue.prototype.request = requestAjax; //axios 原生方法
-Vue.prototype.http = Http; // 根据业务二次封装后axios
+Vue.prototype.$request = request; //axios 原生方法
 
 Vue.config.productionTip = false;
 /* eslint-disable no-new */

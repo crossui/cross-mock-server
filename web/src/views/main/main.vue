@@ -27,6 +27,7 @@
                   <v-icon type="down"></v-icon>
                 </a>
                 <v-menu slot="overlay" @click="handleClickUserDropdown">
+                  <v-menu-item key="ownSpace">个人中心</v-menu-item>
                   <v-menu-item key="loginout" divided>退出登录</v-menu-item>
                 </v-menu>
               </v-dropdown>

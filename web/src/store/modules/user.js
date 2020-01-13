@@ -1,13 +1,18 @@
 import Cookies from 'js-cookie';
 
 const user = {
-    state: {},
+    state: {
+        userinfo: null
+    },
     mutations: {
         logout(state) {
-            console.info('logout.....')
+            Cookies.remove('roles');
             Cookies.remove('user');
             Cookies.remove('password');
             localStorage.clear();
+        },
+        updateUserInfo(state, data) {
+            state.userinfo = data
         }
     }
 };

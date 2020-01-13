@@ -46,45 +46,6 @@ util.formatDate = function(date, format) {
     return format.replace(/([a-z])(\1)*/ig, function(m) { return cfg[m]; });
 }
 
-/** 
- * ajax请求 
- * @param vm   Vue 对象
- * @param opts ajax请求参数
- * @param thenCallback 请求成功后回调
- * @param catchCallback 失败后回调
- * @return nothing 
- **/
-util.axiosAjax = function(vm, opts, thenCallback, catchCallback) {
-    let options = {
-        method: 'get',
-        url: '',
-        withCredentials: true, //  解决跨域造成session不同
-        params: {},
-        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-        timeout: 8000,
-        responseType: 'json',
-    }
-    options = Object.assign({}, options, opts);
-    axios(options).then(function(response) {
-        switch (response.data.code) {
-            case 1:
-                // 退出登录
-                vm.$store.commit('logout', vm)
-                break;
-            case 0:
-                // 成功
-                if (thenCallback) {
-                    thenCallback(response)
-                }
-                break;
-        }
-    }).catch(function(error) {
-        vm.$Message.error('服务器请求失败！！！');
-        if (catchCallback) {
-            catchCallback()
-        }
-    })
-};
 /**
  * @param {*} routers 路由
  * @param {*} name 路由名
