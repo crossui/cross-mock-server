@@ -1,16 +1,10 @@
 const allSqlAction = require("../libs/mysql")
 
 let column1 = 'uid, username, account, verify'
-let column2 = 'uid, username, account, verify, createtime'
 
-//检测是否存在或是否正确
+//检测是否存在
 async function check({ username, account, password }) {
-    let sql = ''
-    if (password) {
-        sql = `select ${column1} from cross_user where account = '${account}' and password = '${password}'`
-    } else {
-        sql = `select ${column1} from cross_user where username = '${username}' or account = '${account}'`
-    }
+    let sql = `select ${column1} from cross_user where username = '${username}' or account = '${account}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
             return res

@@ -1,12 +1,12 @@
-const DB = require('../models/users');
+const DB = require('../models/project');
 
-class UsersCtl {
+class ProjectCtl {
   //查找全部用户并做分页处理
   async find(ctx) {
     const { page, pagesize, account } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
     const endLimit = starLimit + parseInt(pagesize);
-    const res = await DB.find({ account, starLimit, endLimit })
+    const res = await User.find({ account, starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };
   //创建用户
@@ -21,11 +21,11 @@ class UsersCtl {
     });
 
     const { username, account } = ctx.request.body;
-    const repeatedUser = await DB.check({ username, account });
+    const repeatedUser = await User.check({ username, account });
     if (repeatedUser) {
       ctx.body = { message: "用户姓名或登陆账号已经占用", code: 409 }
     } else {
-      ctx.body = await DB.create(ctx.request.body)
+      ctx.body = await User.create(ctx.request.body)
     }
   };
   //用户登陆
@@ -35,9 +35,9 @@ class UsersCtl {
       password: { type: 'string', required: true },
     });
     const { password, account } = ctx.request.body;
-    const repeatedUser = await DB.check({ account, password });
+    const repeatedUser = await User.check({ account, password });
     if (repeatedUser) {
-      const res = await DB.findOne({ uid: repeatedUser[0].uid })
+      const res = await User.findOne({ uid: repeatedUser[0].uid })
       if (res[0].verify == "2") {
         ctx.body = { message: "账号审核未通过请联系管理员", code: 201 }
       } else {
@@ -57,7 +57,7 @@ class UsersCtl {
     });
     /* 是否已经被注册过 */
     const {username, account} = ctx.request.body
-    const repeatedUser = await DB.check({username, account});
+    const repeatedUser = await User.check({username, account});
     if (repeatedUser) {
       let createed = false;
       repeatedUser.forEach(item => {
@@ -71,16 +71,16 @@ class UsersCtl {
       }
     }
     //更新
-    const user = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
+    const user = await User.findByIdAndUpdate(ctx.params.id, ctx.request.body);
     if (!user) { ctx.body = { message: "用户不存在", code: 204 }; }
     ctx.body = { message: "修改成功", code: 200 };
   };
   // 删除用户
   async delete(ctx) {
-    const user = await DB.findByIdAndRemove(ctx.request.body.id);
+    const user = await User.findByIdAndRemove(ctx.request.body.id);
     if (!user) { ctx.body = { message: "删除失败", code: 201 }; }
     ctx.body = { message: "删除成功", code: 200 };
   };
 }
 
-module.exports = new UsersCtl();
+module.exports = new ProjectCtl();

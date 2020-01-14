@@ -192,7 +192,6 @@ export default {
           } else {
             params.createtime = Util.formatDate(new Date());
           }
-          console.info(method, url, data);
           this.$request({
             method,
             url,

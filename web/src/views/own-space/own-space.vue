@@ -89,13 +89,13 @@ export default {
         data: {
           username: this.userForm.username,
           account: this.userForm.account,
-          password: md5(this.userForm.password)
+          password: this.userForm.password == '' ? "" : md5(this.userForm.password)
         }
       }).then(res => {
         if (res) {
           this.$message.success('保存成功');
-          this.save_loading = false;
         }
+        this.save_loading = false;
       });
     }
   },
