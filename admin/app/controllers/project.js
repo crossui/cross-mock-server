@@ -3,10 +3,10 @@ const DB = require('../models/project');
 class ProjectCtl {
   //查找全部用户并做分页处理
   async find(ctx) {
-    const { page, pagesize, account } = ctx.query;
+    const { page, pagesize } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
     const endLimit = starLimit + parseInt(pagesize);
-    const res = await User.find({ account, starLimit, endLimit })
+    const res = await DB.find({ starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };
   //创建用户

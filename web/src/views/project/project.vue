@@ -11,8 +11,8 @@
               <v-list-item
                 slot="renderItem"
                 slot-scope="item, index"
-                key="item.uid"
-                v-bind:class="{'selected': item.uid == selectedProject}"
+                key="item.pid"
+                v-bind:class="{'selected': item.pid == selectedProject}"
               >
                 <v-button-group size="small" slot="actions">
                   <v-button icon="edit" @click="() => handleEidt(item)"></v-button>
@@ -86,6 +86,7 @@
 
 <script>
 export default {
+  name: 'project_index',
   data() {
     return {
       projVisible: false,
@@ -119,16 +120,7 @@ export default {
       selectedProject: "1",
       splitVal: 0.3,
       listLoading: false,
-      projectListData: [
-        {
-          uid: "1",
-          projectname: "2019年福建省新医保接口"
-        },
-        {
-          uid: "2",
-          projectname: "44444"
-        }
-      ],
+      projectListData: [],
       loadingMore: false,
       showLoadingMore: true,
       data: [{ uid: 1, modulesname: "11111" }],
@@ -154,7 +146,13 @@ export default {
       ]
     };
   },
+  mounted() {
+    this.init();
+  },
   methods: {
+    init(){
+      
+    },
     onLoadMore(){
 
     },

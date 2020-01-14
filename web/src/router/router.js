@@ -75,14 +75,14 @@ export const otherRouter = {
 
 export const menuRouter = [
     {
-        path: '/project-manage',
+        path: '/project',
         show: true,
         icon: 'project',
         meta: {
             title: '项目管理'
         },
         roles: ['admin', 'general'],
-        name: 'projectmanage',
+        name: 'project',
         component: Main,
         children: [{
             show: true,
@@ -90,20 +90,20 @@ export const menuRouter = [
             meta: {
                 title: '项目管理'
             },
-            name: 'projectmanage_index',
+            name: 'project_index',
             roles: ['admin', 'general'],
             component: () =>
-                import('@/views/project-manage/project-manage.vue')
+                import('@/views/project/project.vue')
         }]
     },
     {
-        path: '/port-manage',
+        path: '/interface',
         show: true,
         icon: 'control',
         meta: {
             title: '接口管理'
         },
-        name: 'portmanage',
+        name: 'interface',
         roles: ['admin', 'general'],
         component: Main,
         children: [{
@@ -112,20 +112,20 @@ export const menuRouter = [
             meta: {
                 title: '接口管理'
             },
-            name: 'portmanage_index',
+            name: 'interface_index',
             roles: ['admin', 'general'],
             component: () =>
-                import('@/views/port-manage/port-manage.vue')
+                import('@/views/interface/interface.vue')
         }]
     },
     {
-        path: '/user-manage',
+        path: '/user',
         show: true,
         icon: 'team',
         meta: {
             title: '用户管理'
         },
-        name: 'usermanage',
+        name: 'user',
         roles: ['admin'],
         component: Main,
         children: [{
@@ -134,10 +134,10 @@ export const menuRouter = [
             meta: {
                 title: '用户管理'
             },
-            name: 'usermanage_index',
+            name: 'user_index',
             roles: ['admin'],
             component: () =>
-                import('@/views/user-manage/user-manage.vue')
+                import('@/views/user/user.vue')
         }]
     },
 ]

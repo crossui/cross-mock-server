@@ -8,12 +8,12 @@ const {
 } = require('../controllers/project');
 
 
-router.get('/', find); //获取全部用户
+router.get('/', find); //获取全部数据
 
-router.post('/', create); //创建用户
+router.post('/', create); //创建数据
 
-router.patch('/:id', update); //更新用户
+router.patch('/:id', update); //更新数据
 
-router.post('/delete', del); //删除用户
+router.post('/delete', del); //删除数据
 
 module.exports = router;

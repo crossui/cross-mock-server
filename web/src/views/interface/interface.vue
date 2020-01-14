@@ -30,6 +30,7 @@
 
 <script>
 export default {
+  name: 'interface_index',
   data() {
     return {
       titleVal: "全部接口",

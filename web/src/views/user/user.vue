@@ -60,6 +60,7 @@
 import Util from "@/libs/util";
 import md5 from "md5";
 export default {
+  name: 'user_index',
   data() {
     return {
       searchAccount: "",

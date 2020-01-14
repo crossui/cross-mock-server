@@ -110,7 +110,7 @@ util.setCurrentPath = function(vm, items) {
                 name: 'home_index'
             },
             {
-                title: title,
+                title: items.meta.title,
                 path: '',
                 name: name
             }
