@@ -50,39 +50,4 @@ request.interceptors.response.use(
     }
 );
 
-/**
- * 并发请求：axios.all() , axios.spread()
- *      axios.all(
- *          [
- *              axios.get('./data.json'),
- *              axios.get('city.json')
- *          ]
- *      ).then(
- *          axios.spread((dataRes,cityRes) => {
- *              console.log(dataRes,cityRes)
- *          })
- *      )
- *  
- *  */
-
-/**
-  * axios 取消请求
-
-var CancelToken = axios.CancelToken;
-var source = CancelToken.source();
-
-axios.get('/user/12345', {
-  cancelToken: source.token
-}).catch(function (thrown) {
-  if (axios.isCancel(thrown)) {
-    console.log('Request canceled', thrown.message);
-  } else {
-    // handle error
-  }
-});
-// cancel the request (the message parameter is optional)
-source.cancel('Operation canceled by the user.');
-
-*/
-
 export default request

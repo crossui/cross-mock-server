@@ -2,6 +2,15 @@
   <div>
     <v-card title="用户列表">
       <v-button type="primary" size="small" slot="extra" @click="handleAddClick">新增</v-button>
+      <div class="margin-bottom-10">
+        <v-input-search
+          placeholder="登陆账号"
+          v-model="searchAccount"
+          @search="onSearch"
+          enterButton
+          style="width:200px"
+        ></v-input-search>
+      </div>
       <v-table
         :columns="columns"
         :dataSource="data"
@@ -48,9 +57,13 @@
 </template>
 
 <script>
+import Util from "@/libs/util";
+import md5 from "md5";
 export default {
   data() {
     return {
+      searchAccount: "",
+      modalType: true,
       visible: false,
       formValidate: {
         username: "",
@@ -84,16 +97,8 @@ export default {
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ]
       },
-      data: [
-        {
-          uid: 1,
-          username: "11111",
-          account: "faf",
-          verify: "1",
-          createtime: "2019-12-15 14:24"
-        }
-      ],
-      pagination: {},
+      data: [],
+      pagination: { showQuickJumper: true },
       loading: false,
       columns: [
         {
@@ -132,9 +137,38 @@ export default {
       ]
     };
   },
+  mounted() {
+    this.fetch(1);
+  },
   methods: {
+    //获取表格数据   pageNum  当前请求的页码
+    fetch(pageNum) {
+      this.loading = true;
+      this.$request({
+        method: "GET",
+        url: `/users`,
+        params: {
+          account: this.searchAccount,
+          page: pageNum,
+          pagesize: 10
+        }
+      }).then(res => {
+        this.data = res.data.rows;
+        this.pagination = Util.pager(this, this.pagination, {
+          current: pageNum,
+          total: res.data.totals
+        });
+        this.loading = false;
+      });
+    },
     //表格分页
-    handleTableChange() {},
+    handleTableChange(p) {
+      this.fetch(p.current);
+    },
+    //搜索
+    onSearch() {
+      this.fetch(1);
+    },
     //弹窗取消
     handleCancel() {
       this.$refs["formValidate"].resetFields();
@@ -142,12 +176,34 @@ export default {
     },
     //弹窗确认
     handleOk() {
-      this.$refs["formValidate"].resetFields();
-      return;
       this.$refs["formValidate"].validate(valid => {
         if (valid) {
-          this.handleClear();
-          this.$message.success("Success!");
+          let params = {
+            account: this.formValidate.account,
+            username: this.formValidate.username,
+            password: this.formValidate.password == "" ? "" : md5(this.formValidate.password),
+            verify: this.formValidate.verify
+          };
+          let method = "POST";
+          let url = "/users";
+          if (!this.modalType) {
+            method = "PATCH";
+            url = `/users/${this.formValidate.uid}`;
+          } else {
+            params.createtime = Util.formatDate(new Date());
+          }
+          console.info(method, url, data);
+          this.$request({
+            method,
+            url,
+            data: params
+          }).then(res => {
+            if (res) {
+              this.$message.success(res.message);
+              this.fetch(1);
+              this.handleCancel();
+            }
+          });
         } else {
           this.$message.error("Fail!");
         }
@@ -155,10 +211,12 @@ export default {
     },
     //新增用户
     handleAddClick() {
+      this.modalType = true;
       this.visible = true;
     },
     //编辑用户
     handleEidt(record) {
+      this.modalType = false;
       this.visible = true;
       this.$nextTick(() => {
         this.formValidate = Object.assign({}, this.formValidate, record);
@@ -166,11 +224,25 @@ export default {
     },
     //删除用户
     handleDelete(record) {
+      let _this = this;
       this.$confirm({
         title: "提示",
         content: "确认删除些项数据?",
         onOk() {
-          console.log("OK");
+          _this
+            .$request({
+              method: "POST",
+              url: "/users/delete",
+              data: {
+                id: record.uid
+              }
+            })
+            .then(res => {
+              if (res) {
+                _this.$message.success(res.message);
+                _this.fetch(1);
+              }
+            });
         }
       });
     }

@@ -106,7 +106,7 @@ export default {
             password: md5(this.form.password)
           };
           this.$request({
-            method: "post",
+            method: "POST",
             url: "/users/login",
             data: params
           }).then(res => {
@@ -118,6 +118,7 @@ export default {
               }
               Cookies.set("user", this.form.account);
               Cookies.set("password", md5(this.form.password));
+              this.$store.commit("updateUserInfo", res.data[0]);
               this.$router.push({
                 name: "home_index"
               });
