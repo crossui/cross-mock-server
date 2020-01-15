@@ -1,10 +1,9 @@
 const allSqlAction = require("../libs/mysql")
-
-let column1 = 'uid, username, account, verify'
+const Uuid = require('uuid');
 
 //检测是否存在
-async function check({ username, account, password }) {
-    let sql = `select ${column1} from cross_user where username = '${username}' or account = '${account}'`
+async function check({ projectname }) {
+    let sql = `select * from cross_project where projectname = '${projectname}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
             return res
@@ -15,22 +14,23 @@ async function check({ username, account, password }) {
 }
 
 //创建
-async function create({ username, account, password, verify, createtime }) {
-    let sql = `insert into cross_user (username,account,password,verify,createtime) values ('${username}','${account}','${password}','${verify}','${createtime}')`
+async function create({ projectname, createtime }) {
+    let pid = Uuid.v1();
+    let sql = `insert into cross_project (pid, projectname,createtime) values ('${pid}','${projectname}','${createtime}')`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
-            return { message: "提交成功", code: 200 }
+            return true
         } else {
-            return { message: "提交失败", code: 201 }
+            return false
         }
     })
 }
 
 //查找指定数据
-async function findOne({ uid }) {
-    let sql = `select ${column1} from cross_user where uid = '${uid}'`
+async function findOne({ id }) {
+    let sql = `select * from cross_project where pid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
-        if (res.length == 1) {
+        if (res.length) {
             return res
         } else {
             return false
@@ -39,11 +39,10 @@ async function findOne({ uid }) {
 }
 
 //查找数据
-async function find({account = '', verify = "", starLimit = 0 ,endLimit = 10} = {}) {
+async function find({starLimit = 0 ,endLimit = 10} = {}) {
     let sql = `
-        select sql_calc_found_rows ${column2} from cross_user
-        where account like '%${account}%'
-        order by uid desc
+        select sql_calc_found_rows * from cross_project
+        order by pid desc
         limit ${starLimit}, ${endLimit};
     `
     let result = await allSqlAction.allSqlAction(sql)
@@ -53,12 +52,7 @@ async function find({account = '', verify = "", starLimit = 0 ,endLimit = 10} = 
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
-    let sql = `UPDATE cross_user SET 
-    account = '${obj.account}',
-    username = '${obj.username}',
-    password = '${obj.password}',
-    verify = '${obj.verify}'
-    WHERE uid = ${id}`
+    let sql = `UPDATE cross_project SET projectname = '${obj.projectname}' WHERE pid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true
@@ -70,7 +64,7 @@ async function findByIdAndUpdate(id, obj) {
 
 //删除数据
 async function findByIdAndRemove(id){
-    let sql = `delete from cross_user WHERE uid = ${id}`
+    let sql = `delete from cross_project WHERE pid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true

@@ -14,10 +14,10 @@ let allSqlAction = (sql, value) => {
                 reject(err)
             }
             else {
-                console.log("数据库连接成功")
                 connection.query(sql, value, (err, row) => {
                     if (err) reject(err)
                     else{
+                        console.info('mysql:', row)
                         resolve(row)
                     }
                     connection.release()

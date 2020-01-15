@@ -1,11 +1,11 @@
 const Router = require('koa-router');
-const router = new Router({ prefix: '/project' });
+const router = new Router({ prefix: '/modules' });
 const {
     find,
     create,
     update,
     delete: del
-} = require('../controllers/project');
+} = require('../controllers/modules');
 
 
 router.get('/', find); //获取全部数据

@@ -7,28 +7,26 @@
             <div class="clearfix margin-bottom-15">
               <v-button type="primary" size="small" class="fr" @click="handleAddProjectClick">新增</v-button>
             </div>
-            <v-list :dataSource="projectListData" :loading="listLoading" bordered size="small">
+            <v-list
+              :dataSource="projectListData"
+              :loading="listLoading"
+              bordered
+              size="small"
+              :pagination="paginationProj"
+            >
               <v-list-item
                 slot="renderItem"
                 slot-scope="item, index"
                 key="item.pid"
                 v-bind:class="{'selected': item.pid == selectedProject}"
+                @click="handleSelectProj(item)"
               >
                 <v-button-group size="small" slot="actions">
-                  <v-button icon="edit" @click="() => handleEidt(item)"></v-button>
-                  <v-button icon="delete" @click="() => handleDelete(item)"></v-button>
+                  <v-button icon="edit" @click="() => handleEidtProj(item)"></v-button>
+                  <v-button icon="delete" @click="() => handleDeleteProj(item)"></v-button>
                 </v-button-group>
                 <span>{{item.projectname}}</span>
               </v-list-item>
-
-              <div
-                v-if="showLoadingMore"
-                slot="loadMore"
-                :style="{ textAlign: 'center',  height: '32px', lineHeight: '32px' }"
-              >
-                <v-spin v-if="loadingMore"></v-spin>
-                <a v-else @click="onLoadMore">加载更多</a>
-              </div>
             </v-list>
           </div>
           <div slot="right" class="split-pane split-pane-right">
@@ -39,7 +37,8 @@
                   style="width: 200px"
                   @search="onSearch"
                   enterButton
-                  size="small" 
+                  size="small"
+                  v-model="searchModuleName"
                 ></v-input-search>
               </div>
               <v-button type="primary" size="small" class="fr" @click="handleAddModulesClick">新增</v-button>
@@ -68,16 +67,16 @@
 
     <v-modal title="项目名称" v-model="projVisible" @ok="handleProjOk" @cancel="handleProjCancel">
       <v-form ref="formproj" :model="formProj" :rules="ruleProj" :label-width="50">
-        <v-form-item label="名称" prop="projname">
-          <v-input type="text" v-model="formProj.projname" />
+        <v-form-item label="名称" prop="projectname">
+          <v-input type="text" v-model="formProj.projectname" />
         </v-form-item>
       </v-form>
     </v-modal>
 
     <v-modal title="模块名称" v-model="modleVisible" @ok="handleModleOk" @cancel="handleModleCancel">
       <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="50">
-        <v-form-item label="名称" prop="modlename">
-          <v-input type="text" v-model="formModle.modlename" />
+        <v-form-item label="名称" prop="modulename">
+          <v-input type="text" v-model="formModle.modulename" />
         </v-form-item>
       </v-form>
     </v-modal>
@@ -85,16 +84,28 @@
 </template>
 
 <script>
+import Util from "@/libs/util";
 export default {
-  name: 'project_index',
+  name: "project_index",
   data() {
     return {
+      listLoading: false,
       projVisible: false,
+      projModalType: true,
+      projPageNum: 1,
+      paginationProj: {
+        size: "small",
+        simple: true,
+        total: 1,
+        onChange: page => {
+          this.onShowSizeChange(page);
+        }
+      },
       formProj: {
-        projname: ""
+        projectname: ""
       },
       ruleProj: {
-        projname: [
+        projectname: [
           {
             required: true,
             message: "不能为空",
@@ -103,12 +114,17 @@ export default {
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ]
       },
+      projectListData: [],
+      selectedProject: "1",
+
+      searchModuleName: '',
+      modModalType: true,
       modleVisible: false,
       formModle: {
-        modlename: ""
+        modulename: ""
       },
       ruleModle: {
-        modlename: [
+        modulename: [
           {
             required: true,
             message: "不能为空",
@@ -117,25 +133,20 @@ export default {
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ]
       },
-      selectedProject: "1",
       splitVal: 0.3,
-      listLoading: false,
-      projectListData: [],
-      loadingMore: false,
-      showLoadingMore: true,
       data: [{ uid: 1, modulesname: "11111" }],
-      pagination: {},
+      pagination: {showQuickJumper: true},
       loading: false,
       columns: [
         {
           title: "编号",
-          dataIndex: "uid",
+          dataIndex: "mid",
           width: "10%",
           align: "center"
         },
         {
           title: "模块名称",
-          dataIndex: "modulesname"
+          dataIndex: "modulename"
         },
         {
           title: "操作",
@@ -150,32 +161,182 @@ export default {
     this.init();
   },
   methods: {
-    init(){
-      
+    init() {
+      this.fetch(1);
+      this.fetchProject(1);
     },
-    onLoadMore(){
-
+    //获取项目列表
+    fetchProject(pageNum) {
+      this.projPageNum = pageNum;
+      this.listLoading = true;
+      this.$request({
+        method: "GET",
+        url: `/projects`,
+        params: {
+          page: pageNum,
+          pagesize: 10
+        }
+      })
+        .then(res => {
+          this.projectListData = res.data.rows;
+          this.selectedProject = res.data.rows[0].pid;
+          this.paginationProj.total = res.data.totals;
+          this.listLoading = false;
+        })
+        .catch(err => {
+          this.listLoading = false;
+        });
     },
-    //表格分页
-    handleTableChange() {},
     //新增项目
     handleAddProjectClick() {
+      this.projModalType = true;
       this.projVisible = true;
+    },
+    //项目新增确认
+    handleProjOk() {
+      this.$refs["formproj"].validate(valid => {
+        if (valid) {
+          let params = {
+            projectname: this.formProj.projectname
+          };
+          let method = "POST";
+          let url = "/projects";
+          if (!this.projModalType) {
+            method = "PATCH";
+            url = `/projects/${this.formProj.pid}`;
+          } else {
+            params.createtime = Util.formatDate(new Date());
+          }
+          this.$request({
+            method,
+            url,
+            data: params
+          }).then(res => {
+            if (res) {
+              this.$message.success(res.message);
+              this.fetchProject(1);
+              this.handleProjCancel();
+            }
+          });
+        } else {
+          this.$message.error("Fail!");
+        }
+      });
+    },
+    //项目新增取消
+    handleProjCancel() {
+      this.$refs["formproj"].resetFields();
+      this.projVisible = false;
+    },
+    //项目编辑
+    handleEidtProj(record) {
+      this.projModalType = false;
+      this.projVisible = true;
+      this.$nextTick(() => {
+        this.formProj = Object.assign({}, this.formProj, record);
+      });
+    },
+    //项目删除
+    handleDeleteProj(record) {
+      let _this = this;
+      this.$confirm({
+        title: "提示",
+        content: "确认删除些项数据?",
+        onOk() {
+          _this
+            .$request({
+              method: "POST",
+              url: "/projects/delete",
+              data: {
+                id: record.pid
+              }
+            })
+            .then(res => {
+              if (res) {
+                _this.$message.success(res.message);
+                _this.fetchProject(1);
+              }
+            });
+        }
+      });
+    },
+    //选择项目
+    handleSelectProj(record) {
+      this.selectedProject = record.pid;
+    },
+    //项目分页
+    onShowSizeChange(page) {
+      this.fetchProject(page);
+    },
+
+    //获取表格数据   pageNum  当前请求的页码
+    fetch(pageNum) {
+      this.loading = true;
+      this.$request({
+        method: "GET",
+        url: `/modules`,
+        params: {
+          modulename: this.searchModuleName,
+          page: pageNum,
+          pagesize: 10
+        }
+      }).then(res => {
+        this.data = res.data.rows;
+        this.pagination = Util.pager(this, this.pagination, {
+          current: pageNum,
+          total: res.data.totals
+        });
+        this.loading = false;
+      });
+    },
+    //表格分页
+    handleTableChange(p) {
+      this.fetch(p.current);
     },
     //新增模块
     handleAddModulesClick() {
+      this.modModalType = true;
       this.modleVisible = true;
     },
     //搜索
     onSearch() {},
-    //项目新增确认
-    handleProjOk() {},
-    //项目新增取消
-    handleProjCancel() {},
     //模块新增确认
-    handleModleOk() {},
+    handleModleOk() {
+      this.$refs["formModle"].validate(valid => {
+        if (valid) {
+          let params = {
+            modulename: this.formModle.modulename,
+            projectid: this.selectedProject
+          };
+          let method = "POST";
+          let url = "/modules";
+          if (!this.projModalType) {
+            method = "PATCH";
+            url = `/modules/${this.formModle.mid}`;
+          } else {
+            params.createtime = Util.formatDate(new Date());
+          }
+          this.$request({
+            method,
+            url,
+            data: params
+          }).then(res => {
+            if (res) {
+              this.$message.success(res.message);
+              this.fetch(1);
+              this.handleModleCancel();
+            }
+          });
+        } else {
+          this.$message.error("Fail!");
+        }
+      });
+    },
     //模块新增取消
-    handleModleCancel() {}
+    handleModleCancel() {
+      this.$refs["formModle"].resetFields();
+      this.modleVisible = false;
+    }
   }
 };
 </script>
