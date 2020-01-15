@@ -11,7 +11,7 @@
  Target Server Version : 100411
  File Encoding         : 65001
 
- Date: 15/01/2020 15:31:38
+ Date: 15/01/2020 18:20:17
 */
 
 SET NAMES utf8mb4;
@@ -35,6 +35,7 @@ CREATE TABLE `cross_interface`  (
   `api_type` enum('0','1','2','3','4','5') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口请求类型，HTTP请求类型，0 GET,1 PUT,2 POST,3 DELETE,4 OPTIONS,5 PATCH等',
   `is_mockjs` int(1) NULL DEFAULT 0 COMMENT '接口响应数据是否使用mockjs',
   `api_lazy_time` int(10) NULL DEFAULT 0 COMMENT '接口响应延迟时间，单位为毫秒，默认0',
+  `api_desc` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '接口描述',
   PRIMARY KEY (`mockid`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 

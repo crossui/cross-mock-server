@@ -382,7 +382,7 @@ export default {
   }
 }
 .split-wrap {
-  height: 700px;
+  height: 750px;
   .split-pane {
     padding: 20px;
   }
