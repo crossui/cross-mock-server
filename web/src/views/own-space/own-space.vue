@@ -26,7 +26,7 @@
               <v-input v-model="userForm.account"></v-input>
             </div>
           </v-form-item>
-          <v-form-item label="登录密码：">
+          <v-form-item label="登录密码：" prop="password">
             <div style="display:inline-block;width:300px;">
               <v-input type="password" v-model="userForm.password"></v-input>
             </div>
@@ -62,6 +62,15 @@ export default {
         username: [{ required: true, message: "请输入姓名", trigger: "blur" }],
         account: [
           { required: true, message: "请输入登陆账号", trigger: "blur" }
+        ],
+        password: [
+          {
+            required: true,
+            min: 6,
+            message: "不能为空,最少6位",
+            trigger: "blur"
+          },
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ]
       }
     };
@@ -89,11 +98,12 @@ export default {
         data: {
           username: this.userForm.username,
           account: this.userForm.account,
-          password: this.userForm.password == '' ? "" : md5(this.userForm.password)
+          password:
+            this.userForm.password == "" ? "" : md5(this.userForm.password)
         }
       }).then(res => {
         if (res) {
-          this.$message.success('保存成功');
+          this.$message.success("保存成功");
         }
         this.save_loading = false;
       });

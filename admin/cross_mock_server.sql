@@ -11,11 +11,32 @@
  Target Server Version : 100411
  File Encoding         : 65001
 
- Date: 15/01/2020 14:29:17
+ Date: 15/01/2020 15:31:38
 */
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for cross_interface
+-- ----------------------------
+DROP TABLE IF EXISTS `cross_interface`;
+CREATE TABLE `cross_interface`  (
+  `mockid` int(20) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '接口ID，自动生成',
+  `projectid` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '关联的项目ID',
+  `moduleid` int(11) NOT NULL COMMENT '关联的模块ID',
+  `api_name` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口名称',
+  `api_url` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口地址',
+  `api_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口响应数据',
+  `api_content_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口响应数据的参数描述',
+  `api_header_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口请求HEADER参数说明',
+  `api_parms_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口请求GET等表单请求参数说明',
+  `api_body_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口请求POST等表单请求参数说明',
+  `api_type` enum('0','1','2','3','4','5') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口请求类型，HTTP请求类型，0 GET,1 PUT,2 POST,3 DELETE,4 OPTIONS,5 PATCH等',
+  `is_mockjs` int(1) NULL DEFAULT 0 COMMENT '接口响应数据是否使用mockjs',
+  `api_lazy_time` int(10) NULL DEFAULT 0 COMMENT '接口响应延迟时间，单位为毫秒，默认0',
+  PRIMARY KEY (`mockid`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cross_module

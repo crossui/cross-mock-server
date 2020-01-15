@@ -3,7 +3,13 @@
     <v-card :title="titleVal">
       <div class="clearfix margin-bottom-15">
         <div class="fl">
-          <v-input-search size="small" placeholder="接口路径或名称" style="width: 400px" @search="onSearch" enterButton></v-input-search>
+          <v-input-search
+            size="small"
+            placeholder="接口路径或名称"
+            style="width: 400px"
+            @search="onSearch"
+            enterButton
+          ></v-input-search>
         </div>
         <v-button type="primary" size="small" class="fr" @click="handleAddClick">新增</v-button>
       </div>
@@ -30,7 +36,7 @@
 
 <script>
 export default {
-  name: 'interface_index',
+  name: "interface_index",
   data() {
     return {
       titleVal: "全部接口",
@@ -70,11 +76,13 @@ export default {
     };
   },
   methods: {
-    handleAddClick() {},
+    handleAddClick() {
+      this.$router.push({
+        name: "interface_add"
+      });
+    },
     onSearch() {},
-    handleTableChange(){
-
-    }
+    handleTableChange() {}
   }
 };
 </script>

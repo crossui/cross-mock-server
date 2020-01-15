@@ -116,6 +116,16 @@ export const menuRouter = [
             roles: ['admin', 'general'],
             component: () =>
                 import('@/views/interface/interface.vue')
+        },{
+            show: false,
+            path: 'add',
+            meta: {
+                title: '添加接口'
+            },
+            name: 'interface_add',
+            roles: ['admin', 'general'],
+            component: () =>
+                import('@/views/interface/interface_add.vue')
         }]
     },
     {

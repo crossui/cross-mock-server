@@ -60,7 +60,7 @@
 import Util from "@/libs/util";
 import md5 from "md5";
 export default {
-  name: 'user_index',
+  name: "user_index",
   data() {
     return {
       searchAccount: "",
@@ -89,8 +89,16 @@ export default {
           },
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
         ],
+        verify: [
+          {
+            required: true,
+            message: "请选择",
+            trigger: "change"
+          }
+        ],
         password: [
           {
+            required: true,
             min: 6,
             message: "不能为空,最少6位",
             trigger: "blur"
@@ -182,7 +190,10 @@ export default {
           let params = {
             account: this.formValidate.account,
             username: this.formValidate.username,
-            password: this.formValidate.password == "" ? "" : md5(this.formValidate.password),
+            password:
+              this.formValidate.password == ""
+                ? ""
+                : md5(this.formValidate.password),
             verify: this.formValidate.verify
           };
           let method = "POST";
