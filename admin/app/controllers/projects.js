@@ -1,4 +1,5 @@
 const DB = require('../models/projects');
+const moduleDB = require('../models/modules');
 
 class ProjectCtl {
   //查找全部并做分页处理
@@ -53,7 +54,12 @@ class ProjectCtl {
   };
   // 删除
   async delete(ctx) {
-    const res = await DB.findByIdAndRemove(ctx.request.body.id);
+    const id = ctx.request.body.id
+    const moduleRes = await moduleDB.findByPidAndRemove(id)
+    if(!moduleRes){
+      ctx.body = { message: "删除失败", code: 201 };
+    }
+    const res = await DB.findByIdAndRemove(id);
     if (!res) { ctx.body = { message: "删除失败", code: 201 }; }
     ctx.body = { message: "删除成功", code: 200 };
   };

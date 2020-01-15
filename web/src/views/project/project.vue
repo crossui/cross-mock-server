@@ -54,8 +54,8 @@
               <template slot="operation" slot-scope="text, record, index">
                 <div class="editable-row-operations">
                   <v-button-group size="small">
-                    <v-button @click="() => handleEidt(record)">编辑</v-button>
-                    <v-button @click="() => handleDelete(record)">删除</v-button>
+                    <v-button @click="() => handleEidtModule(record)">编辑</v-button>
+                    <v-button @click="() => handleDeleteModule(record)">删除</v-button>
                   </v-button-group>
                 </div>
               </template>
@@ -92,7 +92,6 @@ export default {
       listLoading: false,
       projVisible: false,
       projModalType: true,
-      projPageNum: 1,
       paginationProj: {
         size: "small",
         simple: true,
@@ -115,7 +114,7 @@ export default {
         ]
       },
       projectListData: [],
-      selectedProject: "1",
+      selectedProject: "",
 
       searchModuleName: '',
       modModalType: true,
@@ -162,12 +161,10 @@ export default {
   },
   methods: {
     init() {
-      this.fetch(1);
       this.fetchProject(1);
     },
     //获取项目列表
     fetchProject(pageNum) {
-      this.projPageNum = pageNum;
       this.listLoading = true;
       this.$request({
         method: "GET",
@@ -182,6 +179,7 @@ export default {
           this.selectedProject = res.data.rows[0].pid;
           this.paginationProj.total = res.data.totals;
           this.listLoading = false;
+          this.fetch(1);
         })
         .catch(err => {
           this.listLoading = false;
@@ -241,7 +239,7 @@ export default {
       let _this = this;
       this.$confirm({
         title: "提示",
-        content: "确认删除些项数据?",
+        content: "确认删除些项数据及关联子数据?",
         onOk() {
           _this
             .$request({
@@ -263,6 +261,7 @@ export default {
     //选择项目
     handleSelectProj(record) {
       this.selectedProject = record.pid;
+      this.fetch(1)
     },
     //项目分页
     onShowSizeChange(page) {
@@ -277,6 +276,7 @@ export default {
         url: `/modules`,
         params: {
           modulename: this.searchModuleName,
+          projectid: this.selectedProject,
           page: pageNum,
           pagesize: 10
         }
@@ -299,7 +299,9 @@ export default {
       this.modleVisible = true;
     },
     //搜索
-    onSearch() {},
+    onSearch() {
+      this.fetch(1)
+    },
     //模块新增确认
     handleModleOk() {
       this.$refs["formModle"].validate(valid => {
@@ -310,7 +312,7 @@ export default {
           };
           let method = "POST";
           let url = "/modules";
-          if (!this.projModalType) {
+          if (!this.modModalType) {
             method = "PATCH";
             url = `/modules/${this.formModle.mid}`;
           } else {
@@ -336,6 +338,38 @@ export default {
     handleModleCancel() {
       this.$refs["formModle"].resetFields();
       this.modleVisible = false;
+    },
+    //编辑模块
+    handleEidtModule(record){
+      this.modModalType = false;
+      this.modleVisible = true;
+      this.$nextTick(() => {
+        this.formModle = Object.assign({}, this.formModle, record);
+      });
+    },
+    //删除模块
+    handleDeleteModule(record){
+      let _this = this;
+      this.$confirm({
+        title: "提示",
+        content: "确认删除些项数据及关联子数据?",
+        onOk() {
+          _this
+            .$request({
+              method: "POST",
+              url: "/modules/delete",
+              data: {
+                id: record.mid
+              }
+            })
+            .then(res => {
+              if (res) {
+                _this.$message.success(res.message);
+                _this.fetch(1);
+              }
+            });
+        }
+      });
     }
   }
 };

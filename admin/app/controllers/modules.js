@@ -3,10 +3,10 @@ const DB = require('../models/modules');
 class ModuleCtl {
   //查找全部并做分页处理
   async find(ctx) {
-    const { page, pagesize, modulename } = ctx.query;
+    const { page, pagesize, modulename, projectid } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
     const endLimit = starLimit + parseInt(pagesize);
-    const res = await DB.find({ modulename, starLimit, endLimit })
+    const res = await DB.find({ modulename, projectid, starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };
   //创建数据
@@ -17,8 +17,8 @@ class ModuleCtl {
       projectid: { type: 'string', required: true }
     });
 
-    const { modulename } = ctx.request.body;
-    const repeated = await DB.check({ modulename });
+    const { modulename, projectid } = ctx.request.body;
+    const repeated = await DB.check({ modulename, projectid });
     if (repeated) {
       ctx.body = { message: "此模块名称已使用", code: 409 }
     } else {
@@ -29,27 +29,27 @@ class ModuleCtl {
   //更新数据
   async update(ctx) {
     ctx.verifyParams({
-      projectname: { type: 'string', required: true }
+      modulename: { type: 'string', required: true }
     });
     /* 是否已经被注册过 */
-    const {projectname} = ctx.request.body
-    const repeated = await DB.check({projectname});
+    const { modulename, projectid} = ctx.request.body
+    const repeated = await DB.check({ modulename, projectid });
     if (repeated) {
       let createed = false;
       repeated.forEach(item => {
-        if(item.pid != ctx.params.id) {
+        if (item.mid != ctx.params.id) {
           createed = true;
         }
       })
-      if(createed){
-        ctx.body = { message: "些项目名称已经占用", code: 409 }
+      if (createed) {
+        ctx.body = { message: "些模块名称已经占用", code: 409 }
         return;
       }
     }
-    
+
     //更新
     const res = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!res) { ctx.body = { message: "项目不存在", code: 204 }; }
+    if (!res) { ctx.body = { message: "模块不存在", code: 204 }; }
     ctx.body = { message: "修改成功", code: 200 };
   };
   // 删除

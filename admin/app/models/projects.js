@@ -42,7 +42,7 @@ async function findOne({ id }) {
 async function find({starLimit = 0 ,endLimit = 10} = {}) {
     let sql = `
         select sql_calc_found_rows * from cross_project
-        order by pid desc
+        order by createtime desc
         limit ${starLimit}, ${endLimit};
     `
     let result = await allSqlAction.allSqlAction(sql)
