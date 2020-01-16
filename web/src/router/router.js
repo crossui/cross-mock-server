@@ -122,10 +122,20 @@ export const menuRouter = [
             meta: {
                 title: '添加接口'
             },
-            name: 'interface_add',
+            name: 'interface_add_edit',
             roles: ['admin', 'general'],
             component: () =>
-                import('@/views/interface/interface_add.vue')
+                import('@/views/interface/interface_add_edit.vue')
+        },{
+            show: false,
+            path: 'edit',
+            meta: {
+                title: '编辑接口'
+            },
+            name: 'interface_add_edit',
+            roles: ['admin', 'general'],
+            component: () =>
+                import('@/views/interface/interface_add_edit.vue')
         }]
     },
     {

@@ -78,7 +78,7 @@ export default {
   methods: {
     handleAddClick() {
       this.$router.push({
-        name: "interface_add"
+        name: "interface_add_edit"
       });
     },
     onSearch() {},

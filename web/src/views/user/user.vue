@@ -34,7 +34,7 @@
       </v-table>
     </v-card>
 
-    <v-modal title="用户管理" v-model="visible" @ok="handleOk" @cancel="handleCancel">
+    <v-modal title="用户管理" v-model="visible" @ok="handleOk" @cancel="handleCancel" :maskClosable="false">
       <v-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <v-form-item label="姓名" prop="username">
           <v-input type="text" v-model="formValidate.username" />
@@ -216,7 +216,7 @@ export default {
             }
           });
         } else {
-          this.$message.error("Fail!");
+          this.$message.error("验证失败!");
         }
       });
     },

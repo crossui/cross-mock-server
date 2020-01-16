@@ -1,7 +1,12 @@
 const DB = require('../models/modules');
 
 class ModuleCtl {
-  //查找全部并做分页处理
+  //查找某项目全部数据
+  async findByPidAll(ctx) {
+    const res = await DB.findByPidAll(ctx.params.id)
+    ctx.body = { message: "ok", data: res, code: 200 }
+  };
+  //查找并做分页处理
   async find(ctx) {
     const { page, pagesize, modulename, projectid } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);

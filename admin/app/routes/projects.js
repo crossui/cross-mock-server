@@ -4,11 +4,13 @@ const {
     find,
     create,
     update,
-    delete: del
+    delete: del,
+    findAll
 } = require('../controllers/projects');
 
+router.get('/', find); //获取分页数据
 
-router.get('/', find); //获取全部数据
+router.get('/all', findAll); //获取全部数据
 
 router.post('/', create); //创建数据
 

@@ -38,6 +38,18 @@ async function findOne({ id }) {
     })
 }
 
+//查找全部数据
+async function findAll(){
+    let sql = `select * from cross_project`
+    return allSqlAction.allSqlAction(sql).then(res => {
+        if (res.length) {
+            return res
+        } else {
+            return []
+        }
+    })
+}
+
 //查找数据
 async function find({starLimit = 0 ,endLimit = 10} = {}) {
     let sql = `
@@ -77,6 +89,7 @@ async function findByIdAndRemove(id){
 module.exports = {
     check,
     find,
+    findAll,
     findOne,
     create,
     findByIdAndUpdate,

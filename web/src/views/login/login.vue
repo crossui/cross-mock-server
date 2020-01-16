@@ -28,7 +28,7 @@
       </v-card>
     </div>
 
-    <v-modal title="申请账号" v-model="visible" @ok="handleOk" @cancel="handleCancel">
+    <v-modal title="申请账号" v-model="visible" @ok="handleOk" @cancel="handleCancel" :maskClosable="false">
       <v-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <v-form-item label="姓名" prop="username">
           <v-input type="text" v-model="formValidate.username" placeholder="请填写真实姓名" />

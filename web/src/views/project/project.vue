@@ -65,7 +65,7 @@
       </div>
     </v-card>
 
-    <v-modal title="项目名称" v-model="projVisible" @ok="handleProjOk" @cancel="handleProjCancel">
+    <v-modal title="项目名称" v-model="projVisible" @ok="handleProjOk" @cancel="handleProjCancel" :maskClosable="false">
       <v-form ref="formproj" :model="formProj" :rules="ruleProj" :label-width="50">
         <v-form-item label="名称" prop="projectname">
           <v-input type="text" v-model="formProj.projectname" />
@@ -73,7 +73,7 @@
       </v-form>
     </v-modal>
 
-    <v-modal title="模块名称" v-model="modleVisible" @ok="handleModleOk" @cancel="handleModleCancel">
+    <v-modal title="模块名称" v-model="modleVisible" @ok="handleModleOk" @cancel="handleModleCancel" :maskClosable="false">
       <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="50">
         <v-form-item label="名称" prop="modulename">
           <v-input type="text" v-model="formModle.modulename" />
@@ -217,7 +217,7 @@ export default {
             }
           });
         } else {
-          this.$message.error("Fail!");
+          this.$message.error("验证失败!");
         }
       });
     },
@@ -330,7 +330,7 @@ export default {
             }
           });
         } else {
-          this.$message.error("Fail!");
+          this.$message.error("验证失败!");
         }
       });
     },

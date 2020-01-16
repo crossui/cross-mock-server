@@ -2,7 +2,12 @@ const DB = require('../models/projects');
 const moduleDB = require('../models/modules');
 
 class ProjectCtl {
-  //查找全部并做分页处理
+  //查找全部数据
+  async findAll(ctx){
+    const res = await DB.findAll()
+    ctx.body = { message: "ok", data: res, code: 200 }
+  };
+  //查找并做分页处理
   async find(ctx) {
     const { page, pagesize } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);

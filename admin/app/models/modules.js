@@ -36,6 +36,18 @@ async function findOne({ id }) {
     })
 }
 
+//查找某项目全部数据
+async function findByPidAll(id) {
+    let sql = `select * from cross_module where projectid = '${id}'`
+    return allSqlAction.allSqlAction(sql).then(res => {
+        if (res.length) {
+            return res
+        } else {
+            return []
+        }
+    })
+}
+
 //查找数据
 async function find({modulename = '', projectid = '', starLimit = 0 ,endLimit = 10} = {}) {
     let sql = `
@@ -90,6 +102,7 @@ module.exports = {
     check,
     find,
     findOne,
+    findByPidAll,
     create,
     findByIdAndUpdate,
     findByIdAndRemove,
