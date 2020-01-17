@@ -62,15 +62,11 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
     c.mockid,c.api_name,c.api_url,c.api_type,c.api_status
     from cross_project a,cross_module b,cross_interface c 
     where a.pid=c.projectid and b.mid=c.moduleid
-    
-    and c.api_name like '%${searchval}%'
-    and c.api_url like '%${searchval}%'
+    and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')
+    and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)
+    and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
     order by mockid desc
     limit ${starLimit}, ${endLimit}`
-/* 
-    and c.projectid = '${projectid}' or ${projectid} ='' or ${projectid} is null
-    and c.moduleid = '${moduleid}' or ${moduleid} ='' or ${moduleid} is null
-     */
     let result = await allSqlAction.allSqlAction(sql)
     let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
     return { rows: result, totals: count[0].total }
@@ -90,7 +86,7 @@ async function findByIdAndUpdate(id, obj) {
 
 //删除数据
 async function findByIdAndRemove(id) {
-    let sql = `delete from cross_interface WHERE mid = '${id}'`
+    let sql = `delete from cross_interface WHERE mockid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true

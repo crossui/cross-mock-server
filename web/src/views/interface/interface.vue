@@ -33,8 +33,8 @@
             <v-button-group size="small">
               <v-button @click="() => handleEidt(record)">编辑</v-button>
               <v-button @click="() => handleDelete(record)">删除</v-button>
-              <v-button @click="() => handleDelete(record)">复制</v-button>
-              <v-button @click="() => handleDelete(record)">查看</v-button>
+              <v-button @click="() => handleCopy(record)">复制</v-button>
+              <v-button @click="() => handleView(record)">查看</v-button>
             </v-button-group>
           </div>
         </template>
@@ -191,9 +191,56 @@ export default {
     //新增
     handleAddClick() {
       this.$router.push({
-        name: "interface_add_edit"
+        name: "interface_add"
       });
     },
+    //复制
+    handleCopy(record){
+      this.$router.push({
+        name: "interface_add",
+        query: {
+          id: record.mockid,
+          iscopy: 1
+        }
+      });
+    },
+    //查看
+    handleView(record){
+
+    },
+    //编辑
+    handleEidt(record){
+      this.$router.push({
+        name: "interface_edit",
+        query: {
+          id: record.mockid
+        }
+      });
+    },
+    //删除
+    handleDelete(record){
+      let _this = this;
+      this.$confirm({
+        title: "提示",
+        content: "确认删除些项数据?",
+        onOk() {
+          _this
+            .$request({
+              method: "POST",
+              url: "/interfaces/delete",
+              data: {
+                id: record.mockid
+              }
+            })
+            .then(res => {
+              if (res) {
+                _this.$message.success(res.message);
+                _this.fetch(1);
+              }
+            });
+        }
+      });
+    }
   }
 };
 </script>

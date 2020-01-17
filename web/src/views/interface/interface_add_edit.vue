@@ -452,7 +452,6 @@ const outcolumns = [
   }
 ];
 export default {
-  name: "interface_add_edit",
   data() {
     return {
       spinning: false,
@@ -618,17 +617,37 @@ export default {
       }
     };
   },
+  computed:{
+    apiQueryID(){
+      return this.$route.query.id
+    },
+    apiPageType(){
+      return this.$route.name == "interface_edit" ? false : true
+    },
+    apiPageIsCopy(){
+      return this.$route.query.iscopy
+    }
+  },
   mounted() {
     this.init();
   },
   methods: {
-    //
     async init() {
+      console.info(this.apiQueryID, this.apiPageType, this.apiPageIsCopy )
       this.spinning = true;
       let resProject = await this.getProject();
       this.checkLength(resProject);
       this.optionsProject = resProject;
+      if(this.apiPageType == false || this.apiPageIsCopy){
+        // 先根据MOCKID请求
+
+        // 请求模块列表
+      }
       this.spinning = false;
+    },
+    //赋值
+    assingValue(res){
+      
     },
     //获取项目
     async getProject() {

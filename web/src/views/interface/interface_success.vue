@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     handleBack(){
-
+      this.$router.go(-2)
     },
     handleView(){
       
