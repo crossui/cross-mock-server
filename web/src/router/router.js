@@ -136,6 +136,16 @@ export const menuRouter = [
             roles: ['admin', 'general'],
             component: () =>
                 import('@/views/interface/interface_add_edit.vue')
+        },{
+            show: false,
+            path: 'success',
+            meta: {
+                title: '提示'
+            },
+            name: 'interface_success',
+            roles: ['admin', 'general'],
+            component: () =>
+                import('@/views/interface/interface_success.vue')
         }]
     },
     {

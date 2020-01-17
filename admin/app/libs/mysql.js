@@ -17,7 +17,7 @@ let allSqlAction = (sql, value) => {
                 connection.query(sql, value, (err, row) => {
                     if (err) reject(err)
                     else{
-                        console.info('mysql:', row)
+                        //console.info('mysql:', row)
                         resolve(row)
                     }
                     connection.release()

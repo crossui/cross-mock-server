@@ -21,11 +21,7 @@
               </v-select>
             </v-form-item>
             <v-form-item label="所属模块" prop="moduleid">
-              <v-select
-                style="width: 420px"
-                @change="handleChangeModule"
-                v-model="formValidate1.moduleid"
-              >
+              <v-select style="width: 420px" v-model="formValidate1.moduleid">
                 <template v-for="item in optionsModule">
                   <v-select-option :value="item.mid">{{item.modulename}}</v-select-option>
                 </template>
@@ -36,6 +32,13 @@
                 style="width: 420px"
                 v-model="formValidate1.apitype"
                 :options="optionsApiType"
+              ></v-select>
+            </v-form-item>
+            <v-form-item label="状态" prop="apistatus">
+              <v-select
+                style="width: 420px"
+                v-model="formValidate1.apistatus"
+                :options="optionsApiStatus"
               ></v-select>
             </v-form-item>
             <v-form-item label="接口名称" prop="apiname">
@@ -49,8 +52,9 @@
             <v-form-item label="接口地址" prop="apiurl">
               <v-input
                 type="text"
+                addonBefore="/"
                 v-model="formValidate1.apiurl"
-                placeholder="接口地址（如：/api/user 或 /api/:id）"
+                placeholder="接口地址（如：api/user 或 api/:id）"
               />
             </v-form-item>
             <v-form-item label="接口描述" prop="apidesc">
@@ -77,7 +81,7 @@
                 bordered
                 size="middle"
                 :columns="incolumns"
-                :dataSource="headerData"
+                :dataSource="formValidate2.headerVal"
                 :pagination="false"
                 :scroll="{y: 240 }"
               >
@@ -104,7 +108,7 @@
                 bordered
                 size="middle"
                 :columns="incolumns"
-                :dataSource="getData"
+                :dataSource="formValidate2.getVal"
                 :pagination="false"
                 :scroll="{y: 240 }"
               >
@@ -131,7 +135,7 @@
                 bordered
                 size="middle"
                 :columns="incolumns"
-                :dataSource="bodyData"
+                :dataSource="formValidate2.bodyVal"
                 :pagination="false"
                 :scroll="{y: 240 }"
               >
@@ -158,22 +162,22 @@
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
-                  @click="handleAddRespondHeader"
+                  @click="handleRespondModal('header')"
                 >新增</v-button>
               </div>
               <v-table
                 bordered
                 size="middle"
                 :columns="outcolumns"
-                :dataSource="respondHeaderData"
+                :dataSource="formValidate3.headerVal"
                 :pagination="false"
                 :scroll="{y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtRespond(record)">编辑</v-button>
-                      <v-button @click="() => handleDeleteRespond(record)">删除</v-button>
+                      <v-button @click="() => handleEidtRespond('header',record,index)">编辑</v-button>
+                      <v-button @click="() => handleDeleteRespond('header',record,index)">删除</v-button>
                     </v-button-group>
                   </div>
                 </template>
@@ -188,29 +192,37 @@
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
-                  @click="handleAddRespondJson"
+                  @click="handleRespondModal('respond')"
                 >新增</v-button>
               </div>
               <v-table
                 bordered
                 size="middle"
                 :columns="outcolumns"
-                :dataSource="respondJsonData"
+                :dataSource="formValidate3.respondVal"
                 :pagination="false"
                 :scroll="{y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtRespond(record)">编辑</v-button>
-                      <v-button @click="() => handleDeleteRespond(record)">删除</v-button>
+                      <v-button @click="() => handleEidtRespond('respond',record,index)">编辑</v-button>
+                      <v-button @click="() => handleDeleteRespond('respond',record,index)">删除</v-button>
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
+              <div
+                class="vcu-form-item-error-tip"
+                v-if="formValidate3.respondVal.length==0 && roleValidate3"
+              >不能为空</div>
             </v-form-item>
             <v-form-item label="响应数据" class="vcu-form-item-required">
               <div id="jsoneditorRespond" class></div>
+              <div
+                class="vcu-form-item-error-tip"
+                v-if="respondJsonValidate && roleValidate3"
+              >不能为空,或JSON格式有错误</div>
             </v-form-item>
             <v-form-item label="开启mockjs" props="ismock">
               <v-radio-group v-model="formValidate3.ismock">
@@ -228,10 +240,10 @@
         </v-tab-pane>
       </v-tabs>
 
-      <v-modal v-model="invisible" title="参数说明" :maskClosable="false">
+      <v-modal v-model="invisible" title="参数说明" :maskClosable="false" @cancel="handleCancelInModal">
         <template slot="footer">
           <v-button key="back" @click="handleCancelInModal">取消</v-button>
-          <v-button key="next" type="primary" @click="handleInModal(false)">下一条</v-button>
+          <v-button key="next" type="primary" @click="handleInModal(false)" v-if="inModalNext">下一条</v-button>
           <v-button key="submit" type="primary" @click="handleInModal(true)">完成</v-button>
         </template>
         <v-form ref="formInModal" :model="formInModal" :rules="ruleInModal" :label-width="60">
@@ -252,11 +264,44 @@
           </v-form-item>
         </v-form>
       </v-modal>
+
+      <v-modal
+        v-model="revisible"
+        title="响应参数说明"
+        :maskClosable="false"
+        @cancel="handleCancelReModal"
+      >
+        <template slot="footer">
+          <v-button key="back" @click="handleCancelReModal">取消</v-button>
+          <v-button
+            key="next"
+            type="primary"
+            @click="handleRespondSubmit(false)"
+            v-if="reModalNext"
+          >下一条</v-button>
+          <v-button key="submit" type="primary" @click="handleRespondSubmit(true)">完成</v-button>
+        </template>
+        <v-form ref="formReModal" :model="formReModal" :rules="ruleReModal" :label-width="60">
+          <v-form-item label="返回键" prop="name">
+            <v-input type="text" v-model="formReModal.name" />
+          </v-form-item>
+          <v-form-item label="类型" prop="type">
+            <v-select style="width: 200px" v-model="formReModal.type" :options="dataType"></v-select>
+          </v-form-item>
+          <v-form-item label="返回值" prop="value">
+            <v-input type="text" v-model="formReModal.value" />
+          </v-form-item>
+          <v-form-item label="说明" prop="desc">
+            <v-textarea :rows="6" v-model="formReModal.desc"></v-textarea>
+          </v-form-item>
+        </v-form>
+      </v-modal>
     </div>
   </v-spin>
 </template>
 
 <script>
+import Util from "@/libs/util";
 import jsoneditor from "jsoneditor";
 /////
 import FileReader from "filereader";
@@ -356,11 +401,28 @@ const incolumns = [
     align: "center"
   }
 ];
-
+const optionsApiStatus = [
+  {
+    label: "废弃",
+    value: "0"
+  },
+  {
+    label: "已上线",
+    value: "1"
+  },
+  {
+    label: "开发中",
+    value: "2"
+  },
+  {
+    label: "测试中",
+    value: "3"
+  }
+]
 const outcolumns = [
   {
     title: "返回键",
-    dataIndex: "key",
+    dataIndex: "name",
     width: "20%",
     align: "center"
   },
@@ -395,13 +457,15 @@ export default {
     return {
       spinning: false,
       selectTab: "1",
+
       formValidate1: {
         projectid: "",
         moduleid: "",
         apitype: "",
         apiname: "",
         apiurl: "",
-        apidesc: ""
+        apidesc: "",
+        apistatus: "2"
       },
       ruleValidate1: {
         projectid: [
@@ -422,6 +486,12 @@ export default {
             message: "不能为空"
           }
         ],
+        apistatus: [
+          {
+            required: true,
+            message: "不能为空"
+          }
+        ],
         apiname: [
           {
             required: true,
@@ -436,40 +506,47 @@ export default {
             message: "不能为空",
             trigger: "blur"
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
+          { pattern: /^(?!\/)/, message: "第一个字符不能为“/”" }
         ]
       },
       optionsProject: [],
       optionsModule: [],
       optionsApiType,
+      optionsApiStatus,
 
       formValidate2: {
-        headerVal: "",
-        getVal: "",
-        bodyVal: ""
+        headerVal: [],
+        getVal: [],
+        bodyVal: []
       },
       incolumns,
       inJsonHeader: [],
       inJsonGet: [],
       inJsonBody: [],
-      headerData: [],
-      getData: [],
-      bodyData: [],
 
       formValidate3: {
+        headerVal: [],
+        respondVal: [],
+        headerJson: null,
+        respondJson: null,
         ismock: "0",
         lazytime: 0
       },
+      roleValidate3: false,
+      respondJsonValidate: false,
       outcolumns,
-      respondHeaderData: [],
-      respondJsonData: [],
       jsoneditorHeader: null,
       jsoneditorRespond: null,
-      fileList: [],
-      istab: true,
+      reJsonHeader: [],
+      reJsonRespond: [],
+      errorsHeader: "",
+      errorsRespond: "",
 
       inModalType: "",
+      inModalNext: true,
       invisible: false,
+      inModalIndex: null,
       formInModal: {
         name: "",
         type: "",
@@ -484,7 +561,10 @@ export default {
             message: "不能为空",
             trigger: "blur"
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+          {
+            pattern: /^[A-Za-z0-9]+$/,
+            message: "只允许英文、数字"
+          }
         ],
         type: [
           {
@@ -497,6 +577,44 @@ export default {
             required: true
           }
         ]
+      },
+
+      reModalType: "",
+      reModalNext: true,
+      revisible: false,
+      reModalIndex: null,
+      formReModal: {
+        name: "",
+        type: "",
+        value: "",
+        desc: ""
+      },
+      ruleReModal: {
+        name: [
+          {
+            required: true,
+            message: "不能为空",
+            trigger: "blur"
+          },
+          {
+            pattern: /^[A-Za-z0-9]+$/,
+            message: "只允许英文、数字"
+          }
+        ],
+        type: [
+          {
+            required: true,
+            message: "不能为空"
+          }
+        ],
+        value: [
+          {
+            required: true,
+            message: "不能为空",
+            trigger: "blur"
+          },
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+        ]
       }
     };
   },
@@ -504,6 +622,7 @@ export default {
     this.init();
   },
   methods: {
+    //
     async init() {
       this.spinning = true;
       let resProject = await this.getProject();
@@ -511,6 +630,7 @@ export default {
       this.optionsProject = resProject;
       this.spinning = false;
     },
+    //获取项目
     async getProject() {
       let res = await this.$request({
         method: "GET",
@@ -518,6 +638,7 @@ export default {
       });
       return res.data;
     },
+    //根据项目ID获取模块
     async getModule(id) {
       let res = await this.$request({
         method: "GET",
@@ -525,6 +646,7 @@ export default {
       });
       return res.data;
     },
+    //检查是否有项目或模块
     checkLength(res) {
       let _this = this;
       if (res.length == 0) {
@@ -542,14 +664,24 @@ export default {
     },
     //生成Jsoneditor
     renderJsoneditor() {
+      let _this = this;
       if (this.jsoneditorHeader && this.jsoneditorRespond) return;
       let containerHeader = document.getElementById("jsoneditorHeader");
       let containerRespond = document.getElementById("jsoneditorRespond");
-      let options = {
-        modes: ["code", "form", "text", "tree", "view", "preview"]
+      let optionsHeader = {
+        modes: ["code", "form", "text", "tree", "view", "preview"],
+        onValidationError: function(errors) {
+          _this.errorsHeader = errors;
+        }
       };
-      this.jsoneditorHeader = new jsoneditor(containerHeader, options);
-      this.jsoneditorRespond = new jsoneditor(containerRespond, options);
+      let optionsRespond = {
+        modes: ["code", "form", "text", "tree", "view", "preview"],
+        onValidationError: function(errors) {
+          _this.errorsRespond = errors;
+        }
+      };
+      this.jsoneditorHeader = new jsoneditor(containerHeader, optionsHeader);
+      this.jsoneditorRespond = new jsoneditor(containerRespond, optionsRespond);
     },
     //切换面板的回调
     onTabsChange(activeKey) {
@@ -560,29 +692,71 @@ export default {
       }
     },
     //手动下一步
-    handleNextTabs(p) {
+    async handleNextTabs(p) {
+      let next = true;
       if (p == "2") {
-        this.validateOne();
+        next = await this.validateOne();
       } else if (p == "3") {
-        this.validateTwo();
+        next = this.validateTwo();
       }
-      if (this.istab) this.selectTab = p;
+      if (next) this.selectTab = p;
+      if (p == "3") {
+        this.$nextTick(() => {
+          this.renderJsoneditor();
+        });
+      }
     },
     //验证第一步
-    validateOne() {
-      this.$refs["formValidate1"].validate(valid => {
-        if (valid) {
-          this.istab = true;
-        } else {
-          this.$message.error("验证失败!");
-          this.istab = false;
-        }
-      });
+    async validateOne() {
+      let validate = await this.$refs["formValidate1"].validate();
+      if (!validate) {
+        this.$message.error("验证失败!");
+        return false;
+      }
+      return true;
     },
     //验证第二步
-    validateTwo() {},
+    validateTwo() {
+      return true;
+    },
     //验证第三步
-    validateThr() {},
+    validateThr() {
+      if (this.errorsHeader.length != 0) {
+        this.$error({
+          title: "header响应数据错误",
+          content: this.errorsHeader[0].message
+        });
+        return false;
+      } else {
+        this.formValidate3.headerJson = this.jsoneditorHeader.get();
+      }
+
+      if (this.errorsRespond.length != 0) {
+        this.$error({
+          title: "响应数据错误",
+          content: this.errorsRespond[0].message
+        });
+        return false;
+      }
+
+      let jsoneditorRespondVal = this.jsoneditorRespond.get();
+      let respondValArray = Object.keys(jsoneditorRespondVal);
+      if (respondValArray.length == 0) {
+        this.respondJsonValidate = true;
+      } else {
+        this.respondJsonValidate = false;
+        this.formValidate3.respondJson = jsoneditorRespondVal;
+      }
+      if (
+        respondValArray.length == 0 ||
+        this.formValidate3.respondVal.length == 0
+      ) {
+        this.roleValidate3 = true;
+        return false;
+      }
+      this.roleValidate3 = false;
+      return true;
+    },
     //项目change
     async handleChangeProject(val) {
       this.spinning = true;
@@ -592,20 +766,101 @@ export default {
       this.optionsModule = res;
       this.spinning = false;
     },
-    handleChangeModule() {},
+    //显示响应参数窗口
+    handleRespondModal(type) {
+      this.reJsonHeader = [];
+      this.reJsonRespond = [];
+      this.reModalType = type;
+      this.reModalNext = true;
+      this.revisible = true;
+    },
+    //取消响应参数窗口
+    handleCancelReModal() {
+      this.$refs["formReModal"].resetFields();
+      this.revisible = false;
+    },
+    //响应参数下一步、完成窗口
+    handleRespondSubmit(b) {
+      this.$refs["formReModal"].validate(valid => {
+        if (valid) {
+          let _data = {
+            name: this.formReModal.name,
+            type: this.formReModal.type,
+            value: this.formReModal.value,
+            desc: this.formReModal.desc
+          };
+          if (this.reModalNext) {
+            switch (this.reModalType) {
+              case "header":
+                this.reJsonHeader.push(_data);
+                break;
+              case "respond":
+                this.reJsonRespond.push(_data);
+                break;
+            }
+            if (b) {
+              switch (this.reModalType) {
+                case "header":
+                  this.formValidate3.headerVal = this.formValidate3.headerVal.concat(
+                    this.reJsonHeader
+                  );
+                  break;
+                case "respond":
+                  this.formValidate3.respondVal = this.formValidate3.respondVal.concat(
+                    this.reJsonRespond
+                  );
+                  break;
+              }
+              this.handleCancelReModal();
+            } else {
+              this.$refs["formReModal"].resetFields();
+            }
+          } else {
+            switch (this.reModalType) {
+              case "header":
+                this.formValidate3.headerVal[this.reModalIndex] = _data;
+                break;
+              case "respond":
+                this.formValidate3.respondVal[this.reModalIndex] = _data;
+                break;
+            }
+            this.handleCancelReModal();
+          }
+        } else {
+          this.$message.error("验证失败!");
+        }
+      });
+    },
+    //响应参数编辑
+    handleEidtRespond(type, record, index) {
+      this.reModalType = type;
+      this.revisible = true;
+      this.reModalNext = false;
+      this.reModalIndex = index;
+      this.$nextTick(() => {
+        this.formReModal = Object.assign({}, this.formReModal, record);
+      });
+    },
+    //响应参数删除
+    handleDeleteRespond(type, record, index) {
+      switch (type) {
+        case "header":
+          this.formValidate3.headerVal.splice(index, 1);
+          break;
+        case "respond":
+          this.formValidate3.respondVal.splice(index, 1);
+          break;
+      }
+    },
 
-    handleAddRespondHeader() {},
-    handleAddRespondJson() {},
-    handleSubmit() {},
     //显示入参窗口
     handleClickInModal(type) {
       this.inJsonHeader = [];
       this.inJsonGet = [];
       this.inJsonBody = [];
       this.inModalType = type;
-      this.$nextTick(() => {
-        this.invisible = true;
-      });
+      this.inModalNext = true;
+      this.invisible = true;
     },
     //入参取消窗口
     handleCancelInModal() {
@@ -622,32 +877,53 @@ export default {
             must: this.formInModal.must,
             desc: this.formInModal.desc
           };
-          switch (this.inModalType) {
-            case "header":
-              this.inJsonHeader.push(_data);
-              break;
-            case "get":
-              this.inJsonGet.push(_data);
-              break;
-            case "body":
-              this.inJsonBody.push(_data);
-              break;
-          }
-          if (b) {
+          if (this.inModalNext) {
             switch (this.inModalType) {
               case "header":
-                this.headerData = this.inJsonHeader;
+                this.inJsonHeader.push(_data);
                 break;
               case "get":
-                this.getData = this.inJsonGet;
+                this.inJsonGet.push(_data);
                 break;
               case "body":
-                this.bodyData = this.inJsonBody;
+                this.inJsonBody.push(_data);
+                break;
+            }
+            if (b) {
+              switch (this.inModalType) {
+                case "header":
+                  this.formValidate2.headerVal = this.formValidate2.headerVal.concat(
+                    this.inJsonHeader
+                  );
+                  break;
+                case "get":
+                  this.formValidate2.getVal = this.formValidate2.getVal.concat(
+                    this.inJsonGet
+                  );
+                  break;
+                case "body":
+                  this.formValidate2.bodyVal = this.formValidate2.bodyVal.concat(
+                    this.inJsonBody
+                  );
+                  break;
+              }
+              this.handleCancelInModal();
+            } else {
+              this.$refs["formInModal"].resetFields();
+            }
+          } else {
+            switch (this.inModalType) {
+              case "header":
+                this.formValidate2.headerVal[this.inModalIndex] = _data;
+                break;
+              case "get":
+                this.formValidate2.getVal[this.inModalIndex] = _data;
+                break;
+              case "body":
+                this.formValidate2.bodyVal[this.inModalIndex] = _data;
                 break;
             }
             this.handleCancelInModal();
-          }else{
-            this.$refs["formInModal"].resetFields();
           }
         } else {
           this.$message.error("验证失败!");
@@ -655,13 +931,84 @@ export default {
       });
     },
     //入参编辑
-    handleEidtIn(type,record,index){
-
+    handleEidtIn(type, record, index) {
+      this.inModalType = type;
+      this.invisible = true;
+      this.inModalNext = false;
+      this.inModalIndex = index;
+      this.$nextTick(() => {
+        this.formInModal = Object.assign({}, this.formInModal, record);
+      });
     },
     //入参删除
-    handleDeleteIn(type,record,index){
-      
+    handleDeleteIn(type, record, index) {
+      switch (type) {
+        case "header":
+          this.formValidate2.headerVal.splice(index, 1);
+          break;
+        case "get":
+          this.formValidate2.getVal.splice(index, 1);
+          break;
+        case "body":
+          this.formValidate2.bodyVal.splice(index, 1);
+          break;
+      }
     },
+    //保存
+    async handleSubmit() {
+      let validate = true;
+      validate = await this.validateOne();
+      if (!validate) {
+        this.selectTab = "1";
+        return;
+      }
+      //validate = this.validateTwo()
+      validate = this.validateThr();
+      if (validate) {
+        this.saveResult();
+      }
+    },
+    saveResult() {
+      let data = {
+        projectid: this.formValidate1.projectid,
+        moduleid: this.formValidate1.moduleid,
+        apiname: this.formValidate1.apiname,
+        apiurl: this.formValidate1.apiurl,
+        apitype: this.formValidate1.apitype,
+        apidesc: this.formValidate1.apidesc,
+        apistatus: this.formValidate1.apistatus,
+
+        apiheaderdesc: JSON.stringify(this.formValidate2.headerVal),
+        apiparmsdesc: JSON.stringify(this.formValidate2.getVal),
+        apibodydesc: JSON.stringify(this.formValidate2.bodyVal),
+
+        apicontent: JSON.stringify(this.formValidate3.respondJson),
+        apicontentdesc: JSON.stringify(this.formValidate3.respondVal),
+        ismockjs: parseInt(this.formValidate3.ismock),
+        apireqheader: JSON.stringify(this.formValidate3.headerJson),
+        apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
+        apilazytime: this.formValidate3.lazytime
+      };
+
+      data.createtime = Util.formatDate(new Date());
+
+      this.spinning = true;
+      this.$request({
+        method: "POST",
+        url: `/interfaces`,
+        data
+      }).then(res => {
+        this.spinning = false;
+        this.$router.push({
+          name: "interface_success"
+        });
+      }).catch(err => {
+        this.spinning = false
+      });
+      /* console.info(this.formValidate1);
+      console.info(this.formValidate2);
+      console.info(this.formValidate3); */
+    }
   }
 };
 </script>
