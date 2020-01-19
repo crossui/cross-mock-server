@@ -16,6 +16,8 @@ async function check({ projectname }) {
 //创建
 async function create({ projectname, createtime }) {
     let pid = Uuid.v1();
+    let reg = new RegExp('-', "g");
+    pid = pid.replace(reg, '');
     let sql = `insert into cross_project (pid, projectname,createtime) values ('${pid}','${projectname}','${createtime}')`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {

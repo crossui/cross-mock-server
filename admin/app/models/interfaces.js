@@ -2,7 +2,7 @@ const allSqlAction = require("../libs/mysql")
 
 //检测是否存在
 async function check({ apiname, apiurl, projectid, moduleid }) {
-    let sql = `select * from cross_interface where api_url = '${apiurl}' and api_name = '${apiname}' and projectid = '${projectid}' and moduleid = '${moduleid}'`
+    let sql = `select * from cross_interface where (api_url = '${apiurl}' or api_name = '${apiname}') and projectid = '${projectid}' and moduleid = '${moduleid}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
             return res
@@ -33,20 +33,8 @@ async function create(obj) {
 }
 
 //查找指定数据
-async function findOne({ id }) {
-    let sql = `select * from cross_interface where pid = '${id}'`
-    return allSqlAction.allSqlAction(sql).then(res => {
-        if (res.length) {
-            return res
-        } else {
-            return false
-        }
-    })
-}
-
-//查找某项目全部数据
-async function findByPidAll(id) {
-    let sql = `select * from cross_interface where projectid = '${id}'`
+async function findByMockid(id) {
+    let sql = `select * from cross_interface where mockid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
             return res
@@ -74,7 +62,25 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
-    let sql = `UPDATE cross_interface SET modulename = '${obj.modulename}' WHERE mid = '${id}'`
+    let sql = `UPDATE cross_interface SET
+    projectid = '${obj.projectid}',
+    moduleid = '${obj.moduleid}',
+    api_name = '${obj.apiname}',
+    api_url = '${obj.apiurl}',
+    api_content = '${obj.apicontent}',
+    api_content_desc = '${obj.apicontentdesc}',
+    api_header_desc = '${obj.apiheaderdesc}',
+    api_parms_desc = '${obj.apiparmsdesc}',
+    api_body_desc = '${obj.apibodydesc}',
+    api_type = '${obj.apitype}',
+    is_mockjs = '${obj.ismockjs}',
+    api_lazy_time = '${obj.apilazytime}',
+    api_desc = '${obj.apidesc}',
+    api_req_header = '${obj.apireqheader}',
+    api_req_header_desc = '${obj.apireqheaderdesc}',
+    api_status = '${obj.apistatus}'
+    WHERE mockid = '${id}'`;
+
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true
@@ -111,8 +117,7 @@ async function findByPidAndRemove(id) {
 module.exports = {
     check,
     find,
-    findOne,
-    findByPidAll,
+    findByMockid,
     create,
     findByIdAndUpdate,
     findByIdAndRemove,

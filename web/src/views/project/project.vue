@@ -56,6 +56,7 @@
                   <v-button-group size="small">
                     <v-button @click="() => handleEidtModule(record)">编辑</v-button>
                     <v-button @click="() => handleDeleteModule(record)">删除</v-button>
+                    <v-button @click="() => handleView(record)">查看接口</v-button>
                   </v-button-group>
                 </div>
               </template>
@@ -345,6 +346,16 @@ export default {
       this.modleVisible = true;
       this.$nextTick(() => {
         this.formModle = Object.assign({}, this.formModle, record);
+      });
+    },
+    //查看接口
+    handleView(record){
+      this.$router.push({
+        name: "interface_index",
+        query: {
+          pid: this.selectedProject,
+          mid: record.mid
+        }
       });
     },
     //删除模块

@@ -146,6 +146,16 @@ export const menuRouter = [
             roles: ['admin', 'general'],
             component: () =>
                 import('@/views/interface/interface_success.vue')
+        },{
+            show: false,
+            path: 'postman',
+            meta: {
+                title: '接口测试'
+            },
+            name: 'interface_postman',
+            roles: ['admin', 'general'],
+            component: () =>
+                import('@/views/interface/interface_postman.vue')
         }]
     },
     {

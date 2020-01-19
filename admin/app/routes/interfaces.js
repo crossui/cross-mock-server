@@ -5,14 +5,11 @@ const {
     create,
     update,
     delete: del,
-    findByPidMid,
     findByMockid
 } = require('../controllers/interfaces');
 
 
 router.get('/', find); //获取分页数据
-
-router.get('/:pid/:mid', findByPidMid); //获取某项目某模块全部数据
 
 router.get('/mockid/:mockid', findByMockid); //获取指定数据
 

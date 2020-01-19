@@ -418,7 +418,7 @@ const optionsApiStatus = [
     label: "测试中",
     value: "3"
   }
-]
+];
 const outcolumns = [
   {
     title: "返回键",
@@ -456,7 +456,7 @@ export default {
     return {
       spinning: false,
       selectTab: "1",
-
+      mockId: null,
       formValidate1: {
         projectid: "",
         moduleid: "",
@@ -617,15 +617,15 @@ export default {
       }
     };
   },
-  computed:{
-    apiQueryID(){
-      return this.$route.query.id
+  computed: {
+    apiQueryID() {
+      return this.$route.query.id;
     },
-    apiPageType(){
-      return this.$route.name == "interface_edit" ? false : true
+    apiPageType() {
+      return this.$route.name == "interface_edit" ? false : true;
     },
-    apiPageIsCopy(){
-      return this.$route.query.iscopy
+    apiPageIsCopy() {
+      return this.$route.query.iscopy;
     }
   },
   mounted() {
@@ -633,21 +633,48 @@ export default {
   },
   methods: {
     async init() {
-      console.info(this.apiQueryID, this.apiPageType, this.apiPageIsCopy )
       this.spinning = true;
       let resProject = await this.getProject();
       this.checkLength(resProject);
       this.optionsProject = resProject;
-      if(this.apiPageType == false || this.apiPageIsCopy){
+      if (this.apiPageType == false || this.apiPageIsCopy) {
         // 先根据MOCKID请求
-
+        let res = await this.getMockIdData();
         // 请求模块列表
+        let redModule = await this.getModule(res[0].projectid);
+        this.optionsModule = redModule;
+        this.assingValue(res[0]);
       }
       this.spinning = false;
     },
+    async getMockIdData() {
+      let res = await this.$request({
+        method: "GET",
+        url: `/interfaces/mockid/${this.$route.query.id}`
+      });
+      return res.data;
+    },
     //赋值
-    assingValue(res){
-      
+    assingValue(res) {
+      this.mockId = res.mockid;
+      this.formValidate1.projectid = res.projectid;
+      this.formValidate1.moduleid = res.moduleid;
+      this.formValidate1.apitype = res.api_type;
+      this.formValidate1.apiname = res.api_name;
+      this.formValidate1.apiurl = res.api_url;
+      this.formValidate1.apidesc = res.api_desc;
+      this.formValidate1.apistatus = res.api_status;
+
+      this.formValidate2.headerVal = JSON.parse(res.api_header_desc);
+      this.formValidate2.getVal = JSON.parse(res.api_parms_desc);
+      this.formValidate2.bodyVal = JSON.parse(res.api_body_desc);
+
+      this.formValidate3.headerVal = JSON.parse(res.api_req_header_desc);
+      this.formValidate3.respondVal = JSON.parse(res.api_content_desc);
+      this.formValidate3.headerJson = res.api_req_header;
+      this.formValidate3.respondJson = res.api_content;
+      this.formValidate3.ismock = res.is_mockjs.toString();
+      this.formValidate3.lazytime = res.api_lazy_time;
     },
     //获取项目
     async getProject() {
@@ -701,6 +728,11 @@ export default {
       };
       this.jsoneditorHeader = new jsoneditor(containerHeader, optionsHeader);
       this.jsoneditorRespond = new jsoneditor(containerRespond, optionsRespond);
+
+      if (this.apiPageType == false || this.apiPageIsCopy) {
+        this.jsoneditorHeader.set(JSON.parse(this.formValidate3.headerJson));
+        this.jsoneditorRespond.set(JSON.parse(this.formValidate3.respondJson));
+      }
     },
     //切换面板的回调
     onTabsChange(activeKey) {
@@ -1008,22 +1040,32 @@ export default {
         apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
         apilazytime: this.formValidate3.lazytime
       };
-
-      data.createtime = Util.formatDate(new Date());
+      let method =  "POST"
+      let url = `/interfaces`
+      if(this.apiPageType){
+        data.createtime = Util.formatDate(new Date());
+      }else{
+        method = "PATCH"
+        url = `/interfaces/${this.mockId}`
+      }
 
       this.spinning = true;
       this.$request({
-        method: "POST",
-        url: `/interfaces`,
+        method,
+        url,
         data
-      }).then(res => {
-        this.spinning = false;
-        this.$router.push({
-          name: "interface_success"
+      })
+        .then(res => {
+          if (res) {
+            this.$router.push({
+              name: "interface_success"
+            });
+          }
+          this.spinning = false;
+        })
+        .catch(err => {
+          this.spinning = false;
         });
-      }).catch(err => {
-        this.spinning = false
-      });
       /* console.info(this.formValidate1);
       console.info(this.formValidate2);
       console.info(this.formValidate3); */

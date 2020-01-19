@@ -22,11 +22,11 @@
         @change="handleTableChange"
         bordered
       >
-        <template slot="apitype" slot-scope="text, record, index">
-          {{apiTypeFun(record.api_type)}}
-        </template>
+        <template slot="apitype" slot-scope="text, record, index">{{apiTypeFun(record.api_type)}}</template>
         <template slot="apistatus" slot-scope="text, record, index">
-          {{apistatusFun(record.api_status)}}
+          <v-tag
+            :color="record.api_status == '0' ? 'red' : record.api_status == '1' ? 'green' : record.api_status == '2' ? 'blue' : 'orange'"
+          >{{apistatusFun(record.api_status)}}</v-tag>
         </template>
         <template slot="operation" slot-scope="text, record, index">
           <div class="editable-row-operations">
@@ -45,48 +45,48 @@
 
 <script>
 import Util from "@/libs/util";
-const apiTypeFun = (type) => {
-  let _type = ""
+const apiTypeFun = type => {
+  let _type = "";
   switch (type) {
     case "0":
-      _type = 'GET'
+      _type = "GET";
       break;
     case "1":
-      _type = 'PUT'
+      _type = "PUT";
       break;
     case "2":
-      _type = 'POST'
+      _type = "POST";
       break;
     case "3":
-      _type = 'DELETE'
+      _type = "DELETE";
       break;
     case "4":
-      _type = 'OPTIONS'
+      _type = "OPTIONS";
       break;
     case "5":
-      _type = 'PATCH'
+      _type = "PATCH";
       break;
   }
-  return _type
+  return _type;
 };
-const apistatusFun = (status) => {
-  let _status = ""
+const apistatusFun = status => {
+  let _status = "";
   switch (status) {
     case "0":
-      _status = '废弃'
+      _status = "废弃";
       break;
     case "1":
-      _status = '已上线'
+      _status = "已上线";
       break;
     case "2":
-      _status = '开发中'
+      _status = "开发中";
       break;
     case "3":
-      _status = '测试中'
+      _status = "测试中";
       break;
   }
-  return _status
-}
+  return _status;
+};
 export default {
   name: "interface_index",
   data() {
@@ -104,18 +104,13 @@ export default {
           align: "center"
         },
         {
-          title: "项目名称",
-          dataIndex: "projectname",
-          align: "center"
-        },
-        {
-          title: "模块名称",
-          dataIndex: "modulename",
-          align: "center"
-        },
-        {
           title: "接口名称",
           dataIndex: "api_name",
+          align: "center"
+        },
+        {
+          title: "接口地址",
+          dataIndex: "api_url",
           align: "center"
         },
         {
@@ -125,8 +120,13 @@ export default {
           align: "center"
         },
         {
-          title: "接口地址",
-          dataIndex: "api_url",
+          title: "项目名称",
+          dataIndex: "projectname",
+          align: "center"
+        },
+        {
+          title: "模块名称",
+          dataIndex: "modulename",
           align: "center"
         },
         {
@@ -145,15 +145,20 @@ export default {
     };
   },
   computed: {
-    projectid(){
-      return ''
+    projectid() {
+      return this.$route.query.pid;
     },
-    moduleid(){
-      return ''
+    moduleid() {
+      return this.$route.query.mid;
     }
   },
-  mounted() {
-    this.fetch(1);
+  watch: {
+    $route: {
+      handler(route) {
+        this.fetch(1);
+      },
+      immediate: true
+    }
   },
   methods: {
     apiTypeFun,
@@ -173,6 +178,11 @@ export default {
         }
       }).then(res => {
         this.data = res.data.rows;
+        if (this.moduleid != undefined && this.data.length) {
+          this.titleVal = `${this.data[0].projectname} > ${this.data[0].modulename}`
+        }else{
+          this.titleVal = '全部接口'
+        }
         this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
@@ -195,7 +205,7 @@ export default {
       });
     },
     //复制
-    handleCopy(record){
+    handleCopy(record) {
       this.$router.push({
         name: "interface_add",
         query: {
@@ -205,11 +215,16 @@ export default {
       });
     },
     //查看
-    handleView(record){
-
+    handleView(record) {
+      this.$router.push({
+        name: "interface_postman",
+        query: {
+          id: record.mockid,
+        }
+      });
     },
     //编辑
-    handleEidt(record){
+    handleEidt(record) {
       this.$router.push({
         name: "interface_edit",
         query: {
@@ -218,7 +233,7 @@ export default {
       });
     },
     //删除
-    handleDelete(record){
+    handleDelete(record) {
       let _this = this;
       this.$confirm({
         title: "提示",
