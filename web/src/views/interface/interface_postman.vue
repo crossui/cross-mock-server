@@ -5,7 +5,7 @@
         <v-input style="width: 5%" defaultValue="GET" disabled></v-input>
         <v-input
           style="width: 25%"
-          defaultValue="HTTP://127.0.0.1/74b5f1c03a7f11ea859a9b10c/"
+          defaultValue="http://127.0.0.1/mock/74b5f1c03a7f11ea859a9b10c/105"
           disabled
         ></v-input>
         <v-input-search

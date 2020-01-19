@@ -5,11 +5,14 @@ const {
     create,
     update,
     delete: del,
-    findByPidAll
+    findByPidAll,
+    findInvolv
 } = require('../controllers/modules');
 
 
 router.get('/', find); //获取分页数据
+
+router.get('/involv/:id', findInvolv); //根据MID查找项目名称和模块名称
 
 router.get('/all/:id', findByPidAll); //获取某项目全部数据
 

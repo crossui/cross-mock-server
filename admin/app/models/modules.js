@@ -90,10 +90,19 @@ async function findByIdAndRemove(id){
 async function findByPidAndRemove(id){
     let sql = `delete from cross_module WHERE projectid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
-        if (res.affectedRows == 1) {
-            return true
+        return res.affectedRows
+    })
+}
+
+//根据MID查找项目名称和模块名称
+async function findInvolv(id){
+    let sql = `select a.mid,a.modulename,b.pid,b.projectname from cross_project b,cross_module a
+    where a.projectid=b.pid and a.mid = '${id}'`
+    return allSqlAction.allSqlAction(sql).then(res => {
+        if (res.length) {
+            return res
         } else {
-            return false
+            return []
         }
     })
 }
@@ -103,6 +112,7 @@ module.exports = {
     find,
     findOne,
     findByPidAll,
+    findInvolv,
     create,
     findByIdAndUpdate,
     findByIdAndRemove,

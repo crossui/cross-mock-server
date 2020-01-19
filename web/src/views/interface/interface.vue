@@ -155,6 +155,11 @@ export default {
   watch: {
     $route: {
       handler(route) {
+        if (this.moduleid != undefined) {
+          this.getInvolv()
+        }else{
+          this.titleVal = "全部接口"
+        }
         this.fetch(1);
       },
       immediate: true
@@ -163,6 +168,15 @@ export default {
   methods: {
     apiTypeFun,
     apistatusFun,
+    getInvolv(){
+      this.$request({
+        method: "GET",
+        url: `/modules/involv/${this.moduleid}`
+      }).then(res => {
+        let _res = res.data[0]
+        this.titleVal = `${_res.projectname} > ${_res.modulename} > 接口`
+      });
+    },
     //获取表格数据   pageNum  当前请求的页码
     fetch(pageNum) {
       this.loading = true;
@@ -178,11 +192,6 @@ export default {
         }
       }).then(res => {
         this.data = res.data.rows;
-        if (this.moduleid != undefined && this.data.length) {
-          this.titleVal = `${this.data[0].projectname} > ${this.data[0].modulename}`
-        }else{
-          this.titleVal = '全部接口'
-        }
         this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals

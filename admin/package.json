@@ -16,8 +16,11 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "koa2-cors": "^2.0.6",
+    "mockjs": "^1.1.0",
     "mysql": "^2.17.1",
-    "uuid": "^3.3.3"
+    "path-to-regexp": "^6.1.0",
+    "uuid": "^3.3.3",
+    "vm2": "^3.8.4"
   },
   "devDependencies": {
     "cross-env": "^6.0.3"

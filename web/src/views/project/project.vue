@@ -66,7 +66,13 @@
       </div>
     </v-card>
 
-    <v-modal title="项目名称" v-model="projVisible" @ok="handleProjOk" @cancel="handleProjCancel" :maskClosable="false">
+    <v-modal
+      title="项目名称"
+      v-model="projVisible"
+      @ok="handleProjOk"
+      @cancel="handleProjCancel"
+      :maskClosable="false"
+    >
       <v-form ref="formproj" :model="formProj" :rules="ruleProj" :label-width="50">
         <v-form-item label="名称" prop="projectname">
           <v-input type="text" v-model="formProj.projectname" />
@@ -74,7 +80,13 @@
       </v-form>
     </v-modal>
 
-    <v-modal title="模块名称" v-model="modleVisible" @ok="handleModleOk" @cancel="handleModleCancel" :maskClosable="false">
+    <v-modal
+      title="模块名称"
+      v-model="modleVisible"
+      @ok="handleModleOk"
+      @cancel="handleModleCancel"
+      :maskClosable="false"
+    >
       <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="50">
         <v-form-item label="名称" prop="modulename">
           <v-input type="text" v-model="formModle.modulename" />
@@ -117,7 +129,7 @@ export default {
       projectListData: [],
       selectedProject: "",
 
-      searchModuleName: '',
+      searchModuleName: "",
       modModalType: true,
       modleVisible: false,
       formModle: {
@@ -134,8 +146,8 @@ export default {
         ]
       },
       splitVal: 0.3,
-      data: [{ uid: 1, modulesname: "11111" }],
-      pagination: {showQuickJumper: true},
+      data: [],
+      pagination: { showQuickJumper: true },
       loading: false,
       columns: [
         {
@@ -150,7 +162,7 @@ export default {
         },
         {
           title: "操作",
-          width: "20%",
+          width: "30%",
           scopedSlots: { customRender: "operation" },
           align: "center"
         }
@@ -176,11 +188,13 @@ export default {
         }
       })
         .then(res => {
-          this.projectListData = res.data.rows;
-          this.selectedProject = res.data.rows[0].pid;
-          this.paginationProj.total = res.data.totals;
+          if (res) {
+            this.projectListData = res.data.rows;
+            this.selectedProject = res.data.rows.length ? res.data.rows[0].pid : "";
+            this.paginationProj.total = res.data.totals;
+            this.fetch(1);
+          }
           this.listLoading = false;
-          this.fetch(1);
         })
         .catch(err => {
           this.listLoading = false;
@@ -240,7 +254,7 @@ export default {
       let _this = this;
       this.$confirm({
         title: "提示",
-        content: "确认删除些项数据及关联子数据?",
+        content: "删除项目将会移除其下面所有的模块及接口且不可恢复",
         onOk() {
           _this
             .$request({
@@ -262,7 +276,7 @@ export default {
     //选择项目
     handleSelectProj(record) {
       this.selectedProject = record.pid;
-      this.fetch(1)
+      this.fetch(1);
     },
     //项目分页
     onShowSizeChange(page) {
@@ -301,7 +315,7 @@ export default {
     },
     //搜索
     onSearch() {
-      this.fetch(1)
+      this.fetch(1);
     },
     //模块新增确认
     handleModleOk() {
@@ -341,7 +355,7 @@ export default {
       this.modleVisible = false;
     },
     //编辑模块
-    handleEidtModule(record){
+    handleEidtModule(record) {
       this.modModalType = false;
       this.modleVisible = true;
       this.$nextTick(() => {
@@ -349,7 +363,7 @@ export default {
       });
     },
     //查看接口
-    handleView(record){
+    handleView(record) {
       this.$router.push({
         name: "interface_index",
         query: {
@@ -359,11 +373,11 @@ export default {
       });
     },
     //删除模块
-    handleDeleteModule(record){
+    handleDeleteModule(record) {
       let _this = this;
       this.$confirm({
         title: "提示",
-        content: "确认删除些项数据及关联子数据?",
+        content: "删除模块将会移除其下面所有的接口且不可恢复?",
         onOk() {
           _this
             .$request({

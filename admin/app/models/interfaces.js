@@ -102,15 +102,19 @@ async function findByIdAndRemove(id) {
     })
 }
 
-//删除多条数据
-async function findByPidAndRemove(id) {
+//根据项目ID删除
+async function findByPidAndRemove(id){
     let sql = `delete from cross_interface WHERE projectid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
-        if (res.affectedRows == 1) {
-            return true
-        } else {
-            return false
-        }
+        return res.affectedRows
+    })
+}
+
+//根据模块ID删除
+async function findByMidAndRemove(id){
+    let sql = `delete from cross_interface WHERE moduleid = '${id}'`
+    return allSqlAction.allSqlAction(sql).then(res => {
+        return res.affectedRows
     })
 }
 
@@ -121,5 +125,6 @@ module.exports = {
     create,
     findByIdAndUpdate,
     findByIdAndRemove,
-    findByPidAndRemove
+    findByPidAndRemove,
+    findByMidAndRemove
 }
