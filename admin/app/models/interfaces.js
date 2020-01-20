@@ -17,15 +17,15 @@ async function create(obj) {
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status,rcode) 
     values 
     ('${obj.projectid}','${obj.moduleid}','${obj.apiname}','${obj.apiurl}'
     ,'${obj.apicontent}','${obj.apicontentdesc}','${obj.apiheaderdesc}','${obj.apiparmsdesc}'
     ,'${obj.apibodydesc}','${obj.apitype}','${obj.ismockjs}','${obj.apilazytime}'
-    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}')`;
+    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}','${obj.rcode}')`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
-            return true
+            return res
         } else {
             return false
         }
@@ -41,6 +41,14 @@ async function findByMockid(id) {
         } else {
             return []
         }
+    })
+}
+
+//根据项目ID查找数据
+async function findByPid(id) {
+    let sql = `select * from cross_interface where projectid = '${id}'`
+    return allSqlAction.allSqlAction(sql).then(res => {
+        return res
     })
 }
 
@@ -78,7 +86,8 @@ async function findByIdAndUpdate(id, obj) {
     api_desc = '${obj.apidesc}',
     api_req_header = '${obj.apireqheader}',
     api_req_header_desc = '${obj.apireqheaderdesc}',
-    api_status = '${obj.apistatus}'
+    api_status = '${obj.apistatus}',
+    rcode = '${obj.rcode}'
     WHERE mockid = '${id}'`;
 
     return allSqlAction.allSqlAction(sql).then(res => {
@@ -122,6 +131,7 @@ module.exports = {
     check,
     find,
     findByMockid,
+    findByPid,
     create,
     findByIdAndUpdate,
     findByIdAndRemove,

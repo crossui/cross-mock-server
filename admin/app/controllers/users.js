@@ -56,30 +56,38 @@ class UsersCtl {
       verify: { type: 'string', required: false }
     });
     /* 是否已经被注册过 */
-    const {username, account} = ctx.request.body
-    const repeatedUser = await DB.check({username, account});
+    const { username, account } = ctx.request.body
+    const repeatedUser = await DB.check({ username, account });
     if (repeatedUser) {
       let createed = false;
       repeatedUser.forEach(item => {
-        if(item.uid != ctx.params.id) {
+        if (item.uid != ctx.params.id) {
           createed = true;
         }
       })
-      if(createed){
+      if (createed) {
         ctx.body = { message: "用户姓名或登陆账号已经占用", code: 409 }
         return;
       }
     }
     //更新
     const user = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!user) { ctx.body = { message: "用户不存在", code: 204 }; }
-    ctx.body = { message: "修改成功", code: 200 };
+    if (!user) {
+      ctx.body = { message: "用户不存在", code: 204 };
+    } else {
+      ctx.body = { message: "修改成功", code: 200 };
+
+    }
   };
   // 删除用户
   async delete(ctx) {
     const user = await DB.findByIdAndRemove(ctx.request.body.id);
-    if (!user) { ctx.body = { message: "删除失败", code: 201 }; }
-    ctx.body = { message: "删除成功", code: 200 };
+    if (!user) {
+      ctx.body = { message: "删除失败", code: 201 };
+    } else {
+      ctx.body = { message: "删除成功", code: 200 };
+
+    }
   };
 }
 

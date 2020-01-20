@@ -155,7 +155,12 @@
           </v-form>
         </v-tab-pane>
         <v-tab-pane tab="响应参数设置" key="3">
-          <v-form ref="formValidate3" :model="formValidate3" :label-width="150">
+          <v-form
+            ref="formValidate3"
+            :model="formValidate3"
+            :rules="ruleValidateCheck3"
+            :label-width="150"
+          >
             <v-form-item label="响应Header参数说明">
               <div class="clearfix margin-bottom-5">
                 <v-button
@@ -224,13 +229,16 @@
                 v-if="respondJsonValidate && roleValidate3"
               >不能为空,或JSON格式有错误</div>
             </v-form-item>
-            <v-form-item label="开启mockjs" props="ismock">
+            <v-form-item label="返回状态码" prop="rcode">
+              <v-input v-model="formValidate3.rcode" style="width:200px"></v-input>
+            </v-form-item>
+            <v-form-item label="开启mockjs" prop="ismock">
               <v-radio-group v-model="formValidate3.ismock">
                 <v-radio value="0">开启</v-radio>
                 <v-radio value="1">关闭</v-radio>
               </v-radio-group>
             </v-form-item>
-            <v-form-item label="延迟返回数据" props="lazytime">
+            <v-form-item label="延迟返回数据" prop="lazytime">
               <v-input-number :min="0" :max="100000" v-model="formValidate3.lazytime"></v-input-number>秒
             </v-form-item>
             <v-form-item label>
@@ -530,7 +538,30 @@ export default {
         headerJson: null,
         respondJson: null,
         ismock: "0",
-        lazytime: 0
+        lazytime: 0,
+        rcode: "200"
+      },
+      ruleValidateCheck3: {
+        ismock: [
+          {
+            required: true,
+            message: "不能为空"
+          }
+        ],
+        lazytime: [
+          {
+            required: true,
+            message: "不能为空"
+          }
+        ],
+        rcode: [
+          {
+            required: true,
+            message: "不能为空",
+            trigger: "blur"
+          },
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+        ]
       },
       roleValidate3: false,
       respondJsonValidate: false,
@@ -675,6 +706,7 @@ export default {
       this.formValidate3.respondJson = res.api_content;
       this.formValidate3.ismock = res.is_mockjs.toString();
       this.formValidate3.lazytime = res.api_lazy_time;
+      this.formValidate3.rcode = res.rcode;
     },
     //获取项目
     async getProject() {
@@ -771,7 +803,12 @@ export default {
       return true;
     },
     //验证第三步
-    validateThr() {
+    async validateThr() {
+      let validate = await this.$refs["formValidate3"].validate();
+      if (!validate) {
+        this.$message.error("验证失败!");
+        return false;
+      }
       if (this.errorsHeader.length != 0) {
         this.$error({
           title: "header响应数据错误",
@@ -779,7 +816,11 @@ export default {
         });
         return false;
       } else {
-        this.formValidate3.headerJson = this.jsoneditorHeader.get();
+        try {
+          this.formValidate3.headerJson = this.jsoneditorHeader.get();
+        } catch (error) {
+          this.formValidate3.headerJson = {};
+        }
       }
 
       if (this.errorsRespond.length != 0) {
@@ -788,23 +829,32 @@ export default {
           content: this.errorsRespond[0].message
         });
         return false;
+      } else {
+        try {
+          let jsoneditorRespondVal = this.jsoneditorRespond.get();
+          let respondValArray = Object.keys(jsoneditorRespondVal);
+          if (respondValArray.length === 0) {
+            this.respondJsonValidate = true;
+          } else {
+            this.respondJsonValidate = false;
+            this.formValidate3.respondJson = jsoneditorRespondVal;
+          }
+          if (
+            respondValArray.length == 0 ||
+            this.formValidate3.respondVal.length == 0
+          ) {
+            this.roleValidate3 = true;
+            return false;
+          }
+        } catch (error) {
+          this.$error({
+            title: "响应数据错误",
+            content: "请认真检查，注意不能为空"
+          });
+          return false;
+        }
       }
 
-      let jsoneditorRespondVal = this.jsoneditorRespond.get();
-      let respondValArray = Object.keys(jsoneditorRespondVal);
-      if (respondValArray.length == 0) {
-        this.respondJsonValidate = true;
-      } else {
-        this.respondJsonValidate = false;
-        this.formValidate3.respondJson = jsoneditorRespondVal;
-      }
-      if (
-        respondValArray.length == 0 ||
-        this.formValidate3.respondVal.length == 0
-      ) {
-        this.roleValidate3 = true;
-        return false;
-      }
       this.roleValidate3 = false;
       return true;
     },
@@ -1014,7 +1064,7 @@ export default {
         return;
       }
       //validate = this.validateTwo()
-      validate = this.validateThr();
+      validate = await this.validateThr();
       if (validate) {
         this.saveResult();
       }
@@ -1038,15 +1088,16 @@ export default {
         ismockjs: parseInt(this.formValidate3.ismock),
         apireqheader: JSON.stringify(this.formValidate3.headerJson),
         apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
+        rcode: this.formValidate3.rcode,
         apilazytime: this.formValidate3.lazytime
       };
-      let method =  "POST"
-      let url = `/interfaces`
-      if(this.apiPageType){
+      let method = "POST";
+      let url = `/interfaces`;
+      if (this.apiPageType) {
         data.createtime = Util.formatDate(new Date());
-      }else{
-        method = "PATCH"
-        url = `/interfaces/${this.mockId}`
+      } else {
+        method = "PATCH";
+        url = `/interfaces/${this.mockId}`;
       }
 
       this.spinning = true;
@@ -1058,7 +1109,10 @@ export default {
         .then(res => {
           if (res) {
             this.$router.push({
-              name: "interface_success"
+              name: "interface_success",
+              query: {
+                mockid: res.data.insertId
+              }
             });
           }
           this.spinning = false;

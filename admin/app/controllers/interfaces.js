@@ -1,10 +1,12 @@
 const DB = require('../models/interfaces');
+const IP = require('ip');
+const { serviceport } = require('../config'); //配置信息
 
 class InterfaceCtl {
   //获取指定数据
   async findByMockid(ctx) {
     const res = await DB.findByMockid(ctx.params.mockid)
-    ctx.body = { message: "ok", data: res, code: 200 }
+    ctx.body = { message: "ok", data: res, serviceip: `${IP.address()}:${serviceport}`, code: 200 }
   };
   //查找并做分页处理
   async find(ctx) {
@@ -34,7 +36,8 @@ class InterfaceCtl {
       apireqheader: { type: 'string', required: false },
       apireqheaderdesc: { type: 'string', required: false },
       createtime: { type: 'string', required: false },
-      apistatus: { type: 'string', required: true }
+      apistatus: { type: 'string', required: true },
+      rcode: { type: 'string', required: true }
     });
     const { apiname, apiurl, projectid, moduleid } = ctx.request.body;
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
@@ -42,7 +45,7 @@ class InterfaceCtl {
       ctx.body = { message: "同一项目且同一模块下不可以有一样的接口名称或地址", code: 409 }
     } else {
       let res = await DB.create(ctx.request.body)
-      ctx.body = res ? { message: "提交成功", code: 200 } : { message: "提交失败", code: 201 }
+      ctx.body = res ? { message: "提交成功", data: res, code: 200 } : { message: "提交失败", code: 201 }
     }
   };
   //更新数据
@@ -85,14 +88,22 @@ class InterfaceCtl {
 
     //更新
     const res = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!res) { ctx.body = { message: "接口不存在", code: 204 }; }
-    ctx.body = { message: "修改成功", code: 200 };
+    if (!res) { 
+      ctx.body = { message: "接口不存在", code: 204 }; 
+    } else {
+      ctx.body = { message: "修改成功", data: {insertId: ctx.params.id}, code: 200 };
+
+    }
   };
   // 删除
   async delete(ctx) {
     const res = await DB.findByIdAndRemove(ctx.request.body.id);
-    if (!res) { ctx.body = { message: "删除失败", code: 201 }; }
-    ctx.body = { message: "删除成功", code: 200 };
+    if (!res) {
+      ctx.body = { message: "删除失败", code: 201 };
+    } else {
+      ctx.body = { message: "删除成功", code: 200 };
+
+    }
   };
 }
 

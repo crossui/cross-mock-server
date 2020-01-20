@@ -17,18 +17,28 @@
                 <v-icon slot="prefix" type="lock" color="rgba(0,0,0,.25)"></v-icon>
               </v-input>
             </v-form-item>
+            <v-form-item prop="remember">
+              <div class="clearfix">
+                <v-checkbox v-model="form.remember" class="fl">记住密码</v-checkbox>
+                <a @click="handleApply" class="fr">申请账号</a>
+              </div>
+            </v-form-item>
             <v-form-item>
               <v-button type="primary" @click="handleSubmit" class="login-form-button">登录</v-button>
             </v-form-item>
           </v-form>
-          <div class="login-tip">
-            <a @click="handleApply">申请账号</a>
-          </div>
+          <div class="login-tip"></div>
         </div>
       </v-card>
     </div>
 
-    <v-modal title="申请账号" v-model="visible" @ok="handleOk" @cancel="handleCancel" :maskClosable="false">
+    <v-modal
+      title="申请账号"
+      v-model="visible"
+      @ok="handleOk"
+      @cancel="handleCancel"
+      :maskClosable="false"
+    >
       <v-form ref="formValidate" :model="formValidate" :rules="ruleValidate" :label-width="100">
         <v-form-item label="姓名" prop="username">
           <v-input type="text" v-model="formValidate.username" placeholder="请填写真实姓名" />
@@ -86,24 +96,32 @@ export default {
       },
       form: {
         account: "",
-        password: ""
+        password: "",
+        remember: true
       },
       rules: {
-        account: [
-          { required: true, message: "账号不能为空", trigger: "blur" }
-        ],
+        account: [{ required: true, message: "账号不能为空", trigger: "blur" }],
         password: [{ required: true, message: "密码不能为空", trigger: "blur" }]
       }
     };
+  },
+  mounted() {
+    let userinfo = Cookies.get("crossmockserver_remember");
+    if (userinfo) {
+      userinfo = JSON.parse(userinfo);
+      this.form.account = userinfo.account;
+      this.form.password = userinfo.password;
+    }
   },
   methods: {
     //登陆
     handleSubmit() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
+          let _password = md5(this.form.password);
           let params = {
             account: this.form.account,
-            password: md5(this.form.password)
+            password: _password
           };
           this.$request({
             method: "POST",
@@ -116,8 +134,17 @@ export default {
               } else {
                 Cookies.set("roles", "general");
               }
+              if (this.form.remember) {
+                Cookies.set(
+                  "crossmockserver_remember",
+                  JSON.stringify({
+                    account: this.form.account,
+                    password: this.form.password
+                  })
+                );
+              }
               Cookies.set("user", this.form.account);
-              Cookies.set("password", md5(this.form.password));
+              Cookies.set("password", _password);
               this.$store.commit("updateUserInfo", res.data[0]);
               this.$router.push({
                 name: "home_index"

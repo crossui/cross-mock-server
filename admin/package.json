@@ -8,6 +8,7 @@
     "dev": "nodemon app"
   },
   "dependencies": {
+    "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
     "koa": "^2.11.0",
     "koa-body": "^4.1.1",
@@ -19,8 +20,7 @@
     "mockjs": "^1.1.0",
     "mysql": "^2.17.1",
     "path-to-regexp": "^6.1.0",
-    "uuid": "^3.3.3",
-    "vm2": "^3.8.4"
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "cross-env": "^6.0.3"

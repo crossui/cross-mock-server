@@ -38,7 +38,7 @@ class ModuleCtl {
       modulename: { type: 'string', required: true }
     });
     /* 是否已经被注册过 */
-    const { modulename, projectid} = ctx.request.body
+    const { modulename, projectid } = ctx.request.body
     const repeated = await DB.check({ modulename, projectid });
     if (repeated) {
       let createed = false;
@@ -55,24 +55,36 @@ class ModuleCtl {
 
     //更新
     const res = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!res) { ctx.body = { message: "模块不存在", code: 204 }; }
-    ctx.body = { message: "修改成功", code: 200 };
+    if (!res) {
+      ctx.body = { message: "模块不存在", code: 204 };
+    } else {
+      ctx.body = { message: "修改成功", code: 200 };
+
+    }
   };
   // 删除
   async delete(ctx) {
     const id = ctx.request.body.id
     const interfaceRes = await interfaceDB.findByMidAndRemove(id)
     const res = await DB.findByIdAndRemove(id);
-    if (!res) { ctx.body = { message: "删除失败", code: 201 }; }
-    ctx.body = { message: "删除成功", code: 200 };
+    if (!res) {
+      ctx.body = { message: "删除失败", code: 201 };
+    } else {
+      ctx.body = { message: "删除成功", code: 200 };
+
+    }
   };
   // 根据MID查找项目名称和模块名称
   async findInvolv(ctx) {
     const res = await DB.findInvolv(ctx.params.id);
-    if (!res) { ctx.body = { message: "error", data: res, code: 201 }; }
-    ctx.body = { message: "ok", data: res, code: 200 };
+    if (!res) {
+      ctx.body = { message: "error", data: res, code: 201 };
+    } else {
+      ctx.body = { message: "ok", data: res, code: 200 };
+
+    }
   };
-  
+
 }
 
 module.exports = new ModuleCtl();

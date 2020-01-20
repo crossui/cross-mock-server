@@ -4,7 +4,7 @@ const interfaceDB = require('../models/interfaces');
 
 class ProjectCtl {
   //查找全部数据
-  async findAll(ctx){
+  async findAll(ctx) {
     const res = await DB.findAll()
     ctx.body = { message: "ok", data: res, code: 200 }
   };
@@ -38,25 +38,29 @@ class ProjectCtl {
       projectname: { type: 'string', required: true }
     });
     /* 是否已经被注册过 */
-    const {projectname} = ctx.request.body
-    const repeated = await DB.check({projectname});
+    const { projectname } = ctx.request.body
+    const repeated = await DB.check({ projectname });
     if (repeated) {
       let createed = false;
       repeated.forEach(item => {
-        if(item.pid != ctx.params.id) {
+        if (item.pid != ctx.params.id) {
           createed = true;
         }
       })
-      if(createed){
+      if (createed) {
         ctx.body = { message: "些项目名称已经占用", code: 409 }
         return;
       }
     }
-    
+
     //更新
     const res = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!res) { ctx.body = { message: "项目不存在", code: 204 }; }
-    ctx.body = { message: "修改成功", code: 200 };
+    if (!res) {
+      ctx.body = { message: "项目不存在", code: 204 };
+    } else {
+      ctx.body = { message: "修改成功", code: 200 };
+
+    }
   };
   // 删除
   async delete(ctx) {
@@ -64,8 +68,12 @@ class ProjectCtl {
     const interfaceRes = await interfaceDB.findByPidAndRemove(id)
     const moduleRes = await moduleDB.findByPidAndRemove(id)
     const res = await DB.findByIdAndRemove(id);
-    if (!res) { ctx.body = { message: "删除失败", code: 201 }; }
-    ctx.body = { message: "删除成功", code: 200 };
+    if (!res) {
+      ctx.body = { message: "删除失败", code: 201 };
+    } else {
+      ctx.body = { message: "删除成功", code: 200 };
+
+    }
   };
 }
 

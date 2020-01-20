@@ -1,46 +1,69 @@
 <template>
   <div>
-    <v-card>
-      <v-input-group compact>
-        <v-input style="width: 5%" defaultValue="GET" disabled></v-input>
-        <v-input
-          style="width: 25%"
-          defaultValue="http://127.0.0.1/mock/74b5f1c03a7f11ea859a9b10c/105"
-          disabled
-        ></v-input>
-        <v-input-search
-          style="width: 55%"
-          defaultValue="awddfsafaf/faafds/23232323232321111"
-        >
-          <v-button type="primary" slot="enterButton" :loading="sendLoading">发 送</v-button>
-        </v-input-search>
-      </v-input-group>
-    </v-card>
-    <div class="margin-top-20">
-      <v-card title="响应数据" :bodyStyle="{padding: '0px'}">
-        <div class="split-wrap">
-          <v-split v-model="splitVal">
-            <div slot="left" class="split-pane split-pane-left">
-              <h4>Headers</h4>
-              <v-scrollbar class="scroll-container">
-                <json-viewer :value="jsonHeaders" :expand-depth="50"></json-viewer>
-              </v-scrollbar>
-            </div>
-            <div slot="right" class="split-pane split-pane-right">
-              <h4>Body</h4>
-              <v-scrollbar class="scroll-container">
-                <json-viewer :value="jsonBody" :expand-depth="50"></json-viewer>
-              </v-scrollbar>
-            </div>
-          </v-split>
-        </div>
+    <v-spin :spinning="spinning">
+      <v-card>
+        <v-input-group compact>
+          <v-input style="width: 5%" v-model="apiType" disabled></v-input>
+          <v-input style="width: 25%" v-model="apiPrefix" disabled></v-input>
+          <v-input-search
+            @search="handleSend"
+            style="width: 55%"
+            v-model="apiUrl"
+            enterButton="发 送"
+          ></v-input-search>
+        </v-input-group>
       </v-card>
-    </div>
+      <div class="margin-top-20">
+        <v-card title="响应数据" :bodyStyle="{padding: '0px'}">
+          <div class="split-wrap">
+            <v-split v-model="splitVal">
+              <div slot="left" class="split-pane split-pane-left">
+                <h4>Headers</h4>
+                <v-scrollbar class="scroll-container">
+                  <json-viewer :value="jsonHeaders" :expand-depth="50"></json-viewer>
+                </v-scrollbar>
+              </div>
+              <div slot="right" class="split-pane split-pane-right">
+                <h4>Body</h4>
+                <v-scrollbar class="scroll-container">
+                  <json-viewer :value="jsonBody" :expand-depth="50"></json-viewer>
+                </v-scrollbar>
+              </div>
+            </v-split>
+          </div>
+        </v-card>
+      </div>
+    </v-spin>
   </div>
 </template>
 
 <script>
-import JsonViewer from 'vue-json-viewer'
+import JsonViewer from "vue-json-viewer";
+
+const optionsApiType = type => {
+  let _type = "";
+  switch (type) {
+    case "0":
+      _type = "GET";
+      break;
+    case "1":
+      _type = "PUT";
+      break;
+    case "2":
+      _type = "POST";
+      break;
+    case "3":
+      _type = "DELETE";
+      break;
+    case "4":
+      _type = "OPTIONS";
+      break;
+    case "5":
+      _type = "PATCH";
+      break;
+  }
+  return _type;
+};
 export default {
   name: "interface_postman",
   components: {
@@ -48,16 +71,52 @@ export default {
   },
   data() {
     return {
+      spinning: false,
       splitVal: 0.3,
-      sendLoading: false,
+      apiType: "",
+      apiPrefix: "",
+      apiUrl: "",
       jsonHeaders: {},
       jsonBody: {}
     };
   },
-  mounted(){
-    
+  mounted() {
+    this.init();
   },
-  methods: {}
+  methods: {
+    async init() {
+      this.spinning = true;
+      let res = await this.getApiInfo();
+      let result = res.data[0];
+      let ip = res.serviceip;
+      this.apiType = optionsApiType(result.api_type);
+      this.apiPrefix = `http://${ip}/mock/${result.projectid}/`;
+      this.apiUrl = result.api_url;
+      this.spinning = false;
+    },
+    async getApiInfo() {
+      let id = this.$route.query.id;
+      let res = await this.$request({
+        method: "GET",
+        url: `/interfaces/mockid/${id}`
+      });
+      return res;
+    },
+    handleSend(value) {
+      this.$request({
+        method: this.apiType,
+        url: `${this.apiPrefix}${this.apiUrl}`
+      }).then(res => {
+        if (res) {
+          this.jsonHeaders = res.headers;
+          this.jsonBody = res.data.data;
+        } else {
+          this.jsonHeaders = {};
+          this.jsonBody = {};
+        }
+      });
+    }
+  }
 };
 </script>
 <style lang="less" scoped>

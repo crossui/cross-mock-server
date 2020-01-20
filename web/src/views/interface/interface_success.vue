@@ -19,11 +19,16 @@ export default {
     return {};
   },
   methods: {
-    handleBack(){
-      this.$router.go(-2)
+    handleBack() {
+      this.$router.go(-2);
     },
-    handleView(){
-      
+    handleView() {
+      this.$router.push({
+        name: "interface_postman",
+        query: {
+          id: this.$route.query.mockid
+        }
+      });
     }
   }
 };

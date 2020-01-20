@@ -8,5 +8,7 @@ const database = {
     host: "127.0.0.1" //服务器ip
 };
 
+const serviceport = "8033";
 
-module.exports = { database }
+
+module.exports = { database, serviceport }

@@ -6,7 +6,7 @@ const parameter = require('koa-parameter'); //进行检验请求体格式是否�
 const path = require('path'); // path 模块提供了一些用于处理文件路径的小工具
 const routing = require('./routes'); //路由
 var cors = require('koa2-cors'); //跨域处理
-const { database } = require('./config'); //配置信息
+const { serviceport } = require('./config'); //配置信息
 
 const app = new Koa();
 
@@ -35,4 +35,4 @@ app.use(cors());
 //解析路由
 routing(app);
 //app运行在8033端口
-app.listen(8033, () => console.log('程序启动在 http://localhost:8033'));
+app.listen(serviceport, () => console.log(`程序启动在 http://localhost:${serviceport}`));

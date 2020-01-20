@@ -36,8 +36,12 @@ request.interceptors.response.use(
         const res = response.data;
         // 如果自定义代码不是200，则判断为错误。
         if (res.code !== 200) {
-          message.error(res.message)
-          return
+          if(res.message == "MOCK成功"){
+            return response
+          }else{
+            message.error(res.message)
+            return
+          }
         } else {
             return res
         }
