@@ -11,7 +11,7 @@
  Target Server Version : 100411
  File Encoding         : 65001
 
- Date: 15/01/2020 18:20:17
+ Date: 21/01/2020 16:55:35
 */
 
 SET NAMES utf8mb4;
@@ -33,11 +33,16 @@ CREATE TABLE `cross_interface`  (
   `api_parms_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口请求GET等表单请求参数说明',
   `api_body_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口请求POST等表单请求参数说明',
   `api_type` enum('0','1','2','3','4','5') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '接口请求类型，HTTP请求类型，0 GET,1 PUT,2 POST,3 DELETE,4 OPTIONS,5 PATCH等',
-  `is_mockjs` int(1) NULL DEFAULT 0 COMMENT '接口响应数据是否使用mockjs',
+  `is_mockjs` int(1) NULL DEFAULT 0 COMMENT '接口响应数据是否使用mockjs(0开启，1关闭)',
   `api_lazy_time` int(10) NULL DEFAULT 0 COMMENT '接口响应延迟时间，单位为毫秒，默认0',
   `api_desc` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '接口描述',
+  `createtime` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建时间',
+  `api_req_header` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口响应HEADER参数',
+  `api_req_header_desc` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL COMMENT '接口响应HEADER参数说明',
+  `api_status` enum('0','1','2','3') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '2' COMMENT '接口状态 （0 废弃  1 已上线  2 开发中  3测试中）',
+  `rcode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '200' COMMENT '接口返回状态码',
   PRIMARY KEY (`mockid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cross_module
@@ -48,8 +53,9 @@ CREATE TABLE `cross_module`  (
   `modulename` varchar(2000) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '模块名称',
   `projectid` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '关联项目ID',
   `createtime` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '创建时间',
+  `pmid` int(11) NOT NULL DEFAULT 0 COMMENT '模块上级ID',
   PRIMARY KEY (`mid`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for cross_project

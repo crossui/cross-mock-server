@@ -76,6 +76,7 @@ export default {
       apiType: "",
       apiPrefix: "",
       apiUrl: "",
+      apilazytime: 0,
       jsonHeaders: {},
       jsonBody: {}
     };
@@ -92,6 +93,7 @@ export default {
       this.apiType = optionsApiType(result.api_type);
       this.apiPrefix = `http://${ip}/mock/${result.projectid}/`;
       this.apiUrl = result.api_url;
+      this.apilazytime = result.api_lazy_time;
       this.spinning = false;
     },
     async getApiInfo() {
@@ -103,18 +105,25 @@ export default {
       return res;
     },
     handleSend(value) {
+      this.spinning = true;
       this.$request({
         method: this.apiType,
-        url: `${this.apiPrefix}${this.apiUrl}`
-      }).then(res => {
-        if (res) {
-          this.jsonHeaders = res.headers;
-          this.jsonBody = res.data.data;
-        } else {
-          this.jsonHeaders = {};
-          this.jsonBody = {};
-        }
-      });
+        url: `${this.apiPrefix}${this.apiUrl}`,
+        timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000
+      })
+        .then(res => {
+          if (res) {
+            this.jsonHeaders = res.headers;
+            this.jsonBody = res.data.data;
+          } else {
+            this.jsonHeaders = {};
+            this.jsonBody = {};
+          }
+          this.spinning = false;
+        })
+        .catch(err => {
+          this.spinning = false;
+        });
     }
   }
 };

@@ -46,7 +46,16 @@ async function findByMockid(id) {
 
 //根据项目ID查找数据
 async function findByPid(id) {
-    let sql = `select * from cross_interface where projectid = '${id}'`
+    let sql = `select a.projectname,b.modulename,
+    c.mockid,c.projectid,c.moduleid,c.api_name,
+    c.api_url,c.api_content,c.api_content_desc,
+    c.api_header_desc,c.api_parms_desc,c.api_body_desc,
+    c.api_type,c.is_mockjs,c.api_lazy_time,c.api_desc,
+    c.createtime,c.api_req_header,c.api_req_header_desc,
+    c.api_status,c.rcode
+    from cross_project a,cross_module b,cross_interface c
+    where a.pid=c.projectid and b.mid=c.moduleid and c.projectid = '${id}'
+    order by moduleid desc`
     return allSqlAction.allSqlAction(sql).then(res => {
         return res
     })

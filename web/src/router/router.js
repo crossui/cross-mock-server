@@ -159,6 +159,28 @@ export const menuRouter = [
         }]
     },
     {
+        path: '/export',
+        show: true,
+        icon: 'export',
+        meta: {
+            title: '导出管理'
+        },
+        roles: ['admin', 'general'],
+        name: 'export',
+        component: Main,
+        children: [{
+            show: true,
+            path: 'index',
+            meta: {
+                title: '导出管理'
+            },
+            name: 'export_index',
+            roles: ['admin', 'general'],
+            component: () =>
+                import('@/views/export/export.vue')
+        }]
+    },
+    {
         path: '/user',
         show: true,
         icon: 'team',

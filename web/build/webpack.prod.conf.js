@@ -111,14 +111,9 @@ const webpackConfig = merge(baseWebpackConfig, {
             from: path.resolve(__dirname, '../static'),
             to: config.build.assetsSubDirectory,
             ignore: ['.*']
-        }]),
-
-        // copy tinymce assets
-        new CopyWebpackPlugin([{
-            from: path.resolve(__dirname, '../src/components/tinymce'),
-            to: config.build.assetsSubDirectory,
-            ignore: ['.*']
         }])
+
+       
     ]
 })
 

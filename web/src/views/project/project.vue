@@ -87,7 +87,10 @@
       @cancel="handleModleCancel"
       :maskClosable="false"
     >
-      <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="50">
+      <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="80">
+        <v-form-item label="上级模块" prop="pmid">
+          <v-select v-model="formModle.pmid" style="width:100%" :options="pmidOptions"></v-select>
+        </v-form-item>
         <v-form-item label="名称" prop="modulename">
           <v-input type="text" v-model="formModle.modulename" />
         </v-form-item>
@@ -98,6 +101,23 @@
 
 <script>
 import Util from "@/libs/util";
+
+const convertToTreeData = (data, pmid) => {
+  const result = [];
+  let temp = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].parentId === pid) {
+      const obj = { label: data[i].name, id: data[i].id };
+      temp = this.convertToTreeData(data, data[i].id);
+      if (temp.length > 0) {
+        obj.children = temp;
+      }
+      result.push(obj);
+    }
+  }
+  return result;
+};
+
 export default {
   name: "project_index",
   data() {
@@ -132,10 +152,23 @@ export default {
       searchModuleName: "",
       modModalType: true,
       modleVisible: false,
+      pmidOptions: [
+        {
+          label: "顶级模块",
+          value: "0"
+        }
+      ],
       formModle: {
-        modulename: ""
+        modulename: "",
+        pmid: "0"
       },
       ruleModle: {
+        pmid: [
+          {
+            required: true,
+            message: "不能为空"
+          }
+        ],
         modulename: [
           {
             required: true,
@@ -190,7 +223,9 @@ export default {
         .then(res => {
           if (res) {
             this.projectListData = res.data.rows;
-            this.selectedProject = res.data.rows.length ? res.data.rows[0].pid : "";
+            this.selectedProject = res.data.rows.length
+              ? res.data.rows[0].pid
+              : "";
             this.paginationProj.total = res.data.totals;
             this.fetch(1);
           }
@@ -282,7 +317,6 @@ export default {
     onShowSizeChange(page) {
       this.fetchProject(page);
     },
-
     //获取表格数据   pageNum  当前请求的页码
     fetch(pageNum) {
       this.loading = true;
@@ -296,7 +330,13 @@ export default {
           pagesize: 10
         }
       }).then(res => {
+
+        //pmidOptions
+        
+
         this.data = res.data.rows;
+
+
         this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
