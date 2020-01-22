@@ -13,8 +13,8 @@ async function check({ modulename, projectid }) {
 }
 
 //创建
-async function create({ modulename, createtime, projectid }) {
-    let sql = `insert into cross_module (modulename,projectid,createtime) values ('${modulename}','${projectid}','${createtime}')`
+async function create({ modulename, createtime, projectid, pmid }) {
+    let sql = `insert into cross_module (modulename,projectid,createtime,pmid) values ('${modulename}','${projectid}','${createtime}','${pmid}')`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true
@@ -64,7 +64,7 @@ async function find({modulename = '', projectid = '', starLimit = 0 ,endLimit = 
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
-    let sql = `UPDATE cross_module SET modulename = '${obj.modulename}' WHERE mid = '${id}'`
+    let sql = `UPDATE cross_module SET modulename = '${obj.modulename}', pmid = '${obj.pmid}' WHERE mid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return true

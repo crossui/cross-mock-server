@@ -20,7 +20,8 @@ class ModuleCtl {
     //检验POST请求数据格式是否正解
     ctx.verifyParams({
       modulename: { type: 'string', required: true },
-      projectid: { type: 'string', required: true }
+      projectid: { type: 'string', required: true },
+      pmid: { type: 'number', required: true }
     });
 
     const { modulename, projectid } = ctx.request.body;

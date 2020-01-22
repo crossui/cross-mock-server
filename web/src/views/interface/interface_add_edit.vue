@@ -21,11 +21,14 @@
               </v-select>
             </v-form-item>
             <v-form-item label="所属模块" prop="moduleid">
-              <v-select style="width: 420px" v-model="formValidate1.moduleid">
-                <template v-for="item in optionsModule">
-                  <v-select-option :value="item.mid">{{item.modulename}}</v-select-option>
-                </template>
-              </v-select>
+              <v-tree-select
+                style="width: 420px"
+                :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
+                :treeData="optionsModule"
+                treeDefaultExpandAll
+                labelInValue
+                v-model="formValidate1.moduleid"
+              ></v-tree-select>
             </v-form-item>
             <v-form-item label="请求类型" prop="apitype">
               <v-select
@@ -312,7 +315,7 @@
 import Util from "@/libs/util";
 import jsoneditor from "jsoneditor";
 /////
-import FileReader from "filereader";
+//import FileReader from "filereader";
 const dataType = [
   {
     label: "Int",
@@ -459,6 +462,27 @@ const outcolumns = [
     align: "center"
   }
 ];
+
+const convertToTreeData = (data, pid) => {
+  let result = [],
+    temp;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].pmid === pid) {
+      let obj = {
+        label: data[i].modulename,
+        key: data[i].mid.toString(),
+        value: data[i].mid.toString()
+      };
+      temp = convertToTreeData(data, data[i].mid);
+      if (temp.length > 0) {
+        obj.children = temp;
+      }
+      result.push(obj);
+    }
+  }
+
+  return result;
+};
 export default {
   data() {
     return {
@@ -467,7 +491,7 @@ export default {
       mockId: null,
       formValidate1: {
         projectid: "",
-        moduleid: "",
+        moduleid: undefined,
         apitype: "",
         apiname: "",
         apiurl: "",
@@ -657,9 +681,16 @@ export default {
     },
     apiPageIsCopy() {
       return this.$route.query.iscopy;
+    },
+    addprojectid() {
+      return this.$route.query.pid;
+    },
+    addmoduleid() {
+      return this.$route.query.mid;
     }
   },
   mounted() {
+    /* console.info(this.$) */
     this.init();
   },
   methods: {
@@ -673,8 +704,15 @@ export default {
         let res = await this.getMockIdData();
         // 请求模块列表
         let redModule = await this.getModule(res[0].projectid);
-        this.optionsModule = redModule;
+        this.optionsModule = convertToTreeData(redModule, 0);
         this.assingValue(res[0]);
+      }
+      if (this.addprojectid && this.addmoduleid) {
+        this.formValidate1.projectid = this.addprojectid;
+        // 请求模块列表
+        let redModule = await this.getModule(this.addprojectid);
+        this.optionsModule = convertToTreeData(redModule, 0);
+        this.formValidate1.moduleid = { value: this.addmoduleid.toString() };
       }
       this.spinning = false;
     },
@@ -689,7 +727,7 @@ export default {
     assingValue(res) {
       this.mockId = res.mockid;
       this.formValidate1.projectid = res.projectid;
-      this.formValidate1.moduleid = res.moduleid;
+      this.formValidate1.moduleid = { value: res.moduleid.toString() };
       this.formValidate1.apitype = res.api_type;
       this.formValidate1.apiname = res.api_name;
       this.formValidate1.apiurl = res.api_url;
@@ -861,10 +899,10 @@ export default {
     //项目change
     async handleChangeProject(val) {
       this.spinning = true;
-      this.formValidate1.moduleid = "";
+      this.formValidate1.moduleid = undefined;
       let res = await this.getModule(val);
       this.checkLength(res);
-      this.optionsModule = res;
+      this.optionsModule = convertToTreeData(res, 0);
       this.spinning = false;
     },
     //显示响应参数窗口
@@ -1072,7 +1110,7 @@ export default {
     saveResult() {
       let data = {
         projectid: this.formValidate1.projectid,
-        moduleid: this.formValidate1.moduleid,
+        moduleid: parseInt(this.formValidate1.moduleid.value),
         apiname: this.formValidate1.apiname,
         apiurl: this.formValidate1.apiurl,
         apitype: this.formValidate1.apitype,
@@ -1099,6 +1137,7 @@ export default {
         method = "PATCH";
         url = `/interfaces/${this.mockId}`;
       }
+      console.info(data);
 
       this.spinning = true;
       this.$request({

@@ -156,9 +156,9 @@ export default {
     $route: {
       handler(route) {
         if (this.moduleid != undefined) {
-          this.getInvolv()
-        }else{
-          this.titleVal = "全部接口"
+          this.getInvolv();
+        } else {
+          this.titleVal = "全部接口";
         }
         this.fetch(1);
       },
@@ -168,13 +168,13 @@ export default {
   methods: {
     apiTypeFun,
     apistatusFun,
-    getInvolv(){
+    getInvolv() {
       this.$request({
         method: "GET",
         url: `/modules/involv/${this.moduleid}`
       }).then(res => {
-        let _res = res.data[0]
-        this.titleVal = `${_res.projectname} > ${_res.modulename} > 接口`
+        let _res = res.data[0];
+        this.titleVal = `${_res.projectname} > ${_res.modulename} > 接口`;
       });
     },
     //获取表格数据   pageNum  当前请求的页码
@@ -209,8 +209,13 @@ export default {
     },
     //新增
     handleAddClick() {
+      let query = {
+        pid: this.$route.query.pid,
+        mid: this.$route.query.mid
+      };
       this.$router.push({
-        name: "interface_add"
+        name: "interface_add",
+        query
       });
     },
     //复制
@@ -228,7 +233,7 @@ export default {
       this.$router.push({
         name: "interface_postman",
         query: {
-          id: record.mockid,
+          id: record.mockid
         }
       });
     },

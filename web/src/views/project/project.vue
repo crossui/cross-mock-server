@@ -44,8 +44,10 @@
               <v-button type="primary" size="small" class="fr" @click="handleAddModulesClick">新增</v-button>
             </div>
             <v-table
+              :rowKey="record => record.mid"
+              :indentSize="30"
               :columns="columns"
-              :dataSource="data"
+              :dataSource="tabledata"
               :pagination="pagination"
               :loading="loading"
               @change="handleTableChange"
@@ -54,6 +56,7 @@
               <template slot="operation" slot-scope="text, record, index">
                 <div class="editable-row-operations">
                   <v-button-group size="small">
+                    <v-button @click="() => handleAddChildModule(record)" v-if="!record.child">添加</v-button>
                     <v-button @click="() => handleEidtModule(record)">编辑</v-button>
                     <v-button @click="() => handleDeleteModule(record)">删除</v-button>
                     <v-button @click="() => handleView(record)">查看接口</v-button>
@@ -102,19 +105,41 @@
 <script>
 import Util from "@/libs/util";
 
-const convertToTreeData = (data, pmid) => {
-  const result = [];
-  let temp = [];
+const convertSelectData = data => {
+  let result = [
+    {
+      label: "顶级模块",
+      value: "0"
+    }
+  ];
+  data.forEach(item => {
+    if (item.pmid === 0) {
+      result.push({
+        label: item.modulename,
+        value: item.mid.toString()
+      });
+    }
+  });
+  return result;
+};
+
+const convertToTreeData = (data, pid) => {
+  let result = [],
+    temp;
   for (let i = 0; i < data.length; i++) {
-    if (data[i].parentId === pid) {
-      const obj = { label: data[i].name, id: data[i].id };
-      temp = this.convertToTreeData(data, data[i].id);
+    if (data[i].pmid === pid) {
+      let obj = data[i];
+      temp = convertToTreeData(data, data[i].mid);
       if (temp.length > 0) {
+        temp.forEach(item => {
+          item.child = true;
+        });
         obj.children = temp;
       }
       result.push(obj);
     }
   }
+
   return result;
 };
 
@@ -152,12 +177,7 @@ export default {
       searchModuleName: "",
       modModalType: true,
       modleVisible: false,
-      pmidOptions: [
-        {
-          label: "顶级模块",
-          value: "0"
-        }
-      ],
+      pmidOptions: [],
       formModle: {
         modulename: "",
         pmid: "0"
@@ -179,16 +199,10 @@ export default {
         ]
       },
       splitVal: 0.3,
-      data: [],
+      tabledata: [],
       pagination: { showQuickJumper: true },
       loading: false,
       columns: [
-        {
-          title: "编号",
-          dataIndex: "mid",
-          width: "10%",
-          align: "center"
-        },
         {
           title: "模块名称",
           dataIndex: "modulename"
@@ -330,13 +344,8 @@ export default {
           pagesize: 10
         }
       }).then(res => {
-
-        //pmidOptions
-        
-
-        this.data = res.data.rows;
-
-
+        this.pmidOptions = convertSelectData(res.data.rows);
+        this.tabledata = convertToTreeData(res.data.rows, 0);
         this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
@@ -363,7 +372,8 @@ export default {
         if (valid) {
           let params = {
             modulename: this.formModle.modulename,
-            projectid: this.selectedProject
+            projectid: this.selectedProject,
+            pmid: parseInt(this.formModle.pmid)
           };
           let method = "POST";
           let url = "/modules";
@@ -373,6 +383,7 @@ export default {
           } else {
             params.createtime = Util.formatDate(new Date());
           }
+
           this.$request({
             method,
             url,
@@ -399,6 +410,7 @@ export default {
       this.modModalType = false;
       this.modleVisible = true;
       this.$nextTick(() => {
+        record.pmid = record.pmid.toString();
         this.formModle = Object.assign({}, this.formModle, record);
       });
     },
@@ -412,6 +424,8 @@ export default {
         }
       });
     },
+    //添加子级模块
+    handleAddChildModule(record) {},
     //删除模块
     handleDeleteModule(record) {
       let _this = this;

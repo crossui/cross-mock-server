@@ -106,9 +106,8 @@ export default {
     };
   },
   mounted() {
-    let userinfo = Cookies.get("crossmockserver_remember");
+    let userinfo = this.$store.state.user.rememberUser;
     if (userinfo) {
-      userinfo = JSON.parse(userinfo);
       this.form.account = userinfo.account;
       this.form.password = userinfo.password;
     }
@@ -135,13 +134,10 @@ export default {
                 Cookies.set("roles", "general");
               }
               if (this.form.remember) {
-                Cookies.set(
-                  "crossmockserver_remember",
-                  JSON.stringify({
-                    account: this.form.account,
-                    password: this.form.password
-                  })
-                );
+                this.$store.commit("updateUser", {
+                  account: this.form.account,
+                  password: this.form.password
+                });
               }
               Cookies.set("user", this.form.account);
               Cookies.set("password", _password);
