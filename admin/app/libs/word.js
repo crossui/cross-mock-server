@@ -145,12 +145,12 @@ const apiTypeFun = type => {
 const renderInTableArray = (arr) => {
     let table = [];
     table = table.concat(inTable)
-    try{
+    try {
         let _arr = JSON.parse(arr)
-        _arr.forEach(item=>{
-            table.push([item.name,item.type,item.value,item.desc])
+        _arr.forEach(item => {
+            table.push([item.name, item.type, item.value, item.desc])
         })
-    }catch(err){
+    } catch (err) {
 
     }
     return table;
@@ -159,12 +159,12 @@ const renderInTableArray = (arr) => {
 const renderOutTableArray = (arr) => {
     let table = [];
     table = table.concat(outTable)
-    try{
+    try {
         let _arr = JSON.parse(arr)
-        _arr.forEach(item=>{
-            table.push([item.name,item.type,item.must,item.desc])
+        _arr.forEach(item => {
+            table.push([item.name, item.type, item.must, item.desc])
         })
-    }catch(err){
+    } catch (err) {
 
     }
     return table;
@@ -210,7 +210,7 @@ async function generate(result) {
                 let inHeaderDescObj = myDoc.createP()
                 inHeaderDescObj.addText(`${protIndex}.${++i} 请求Header参数说明：`, { font_size: 14 });
                 let inHeaderDescTable = renderInTableArray(item.api_header_desc);
-                
+
                 myDoc.createTable(inHeaderDescTable, tableStyle)
             }
             //请求Get参数说明
@@ -243,6 +243,16 @@ async function generate(result) {
             }
 
             myDoc.createP({ align: 'center' })
+        })
+
+        fs.exists("./app/public/exports", function (exists) {
+            if (!exists) {
+                fs.mkdir("./app/public/exports", function (err) {
+                    if (err) {
+                        return console.error(err);
+                    }
+                });
+            }
         })
 
         // 创建文件

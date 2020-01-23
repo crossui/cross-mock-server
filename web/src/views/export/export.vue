@@ -85,6 +85,8 @@ export default {
           total: res.data.totals
         });
         this.loading = false;
+      }).catch(err =>{
+        this.loading = false;
       });
     },
     handleTableChange(p){
@@ -104,6 +106,8 @@ export default {
       }).then(res => {
         this.fileUrl = res.data.fileUrl;
         this.downloadFile()
+        this.loading = false;
+      }).catch(err =>{
         this.loading = false;
       });
     },

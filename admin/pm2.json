@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "name": "crossmockserver",
+      "script": "app/index.js",
+      "cwd": "./",
+      "exec_mode": "cluster",
+      "error_file": "./logs/app-err.log",
+      "out_file": "./logs/app-out.log",
+      "instances": 0,
+      "max_memory_restart": "2G",
+      "autorestart": true,
+      "node_args": [],
+      "args": [],
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "env": {}
+    }
+  ]
+}

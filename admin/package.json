@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=production node app",
-    "dev": "nodemon app"
+    "dev": "nodemon app",
+    "pm2": "pm2 start pm2.json"
   },
   "dependencies": {
     "ip": "^1.1.5",
