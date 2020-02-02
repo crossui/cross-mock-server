@@ -4,9 +4,10 @@ import Vcu from 'vcu'
 import { router } from './router/index'
 import store from './store';
 import request from '@/libs/request';
+import ElementDataset from 'element-dataset'
 import 'babel-polyfill'
 
-
+ElementDataset()
 Vue.use(Vcu)
 
 Vue.prototype.$request = request; //axios 原生方法

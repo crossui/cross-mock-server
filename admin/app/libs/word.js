@@ -1,5 +1,6 @@
 const officegen = require('officegen');
 const fs = require('fs');
+const { createMkdir } = require('../libs/util');
 
 const inTable = [
     [
@@ -170,6 +171,8 @@ const renderOutTableArray = (arr) => {
     return table;
 }
 
+
+
 async function generate(result) {
     return new Promise((resolve, reject) => {
         let myDoc = officegen('docx');
@@ -244,20 +247,16 @@ async function generate(result) {
 
             myDoc.createP({ align: 'center' })
         })
+        let out,nowtime;
+        //判断目录是否存在
+        if (createMkdir('./app/public/exports')) {
+            // 创建文件
+            nowtime = (new Date()).getTime();
+            out = fs.createWriteStream(`./app/public/exports/${nowtime}.docx`);
+        }else{
+            reject()
+        }
 
-        fs.exists("./app/public/exports", function (exists) {
-            if (!exists) {
-                fs.mkdir("./app/public/exports", function (err) {
-                    if (err) {
-                        return console.error(err);
-                    }
-                });
-            }
-        })
-
-        // 创建文件
-        let nowtime = (new Date()).getTime();
-        let out = fs.createWriteStream(`./app/public/exports/${nowtime}.docx`);
 
         // 文件写入内容
         myDoc.generate(out, {

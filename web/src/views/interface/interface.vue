@@ -190,14 +190,18 @@ export default {
           page: pageNum,
           pagesize: 10
         }
-      }).then(res => {
-        this.data = res.data.rows;
-        this.pagination = Util.pager(this, this.pagination, {
-          current: pageNum,
-          total: res.data.totals
+      })
+        .then(res => {
+          this.data = res.data.rows;
+          this.pagination = Util.pager(this, this.pagination, {
+            current: pageNum,
+            total: res.data.totals
+          });
+          this.loading = false;
+        })
+        .catch(err => {
+          this.loading = false;
         });
-        this.loading = false;
-      });
     },
     //表格分页
     handleTableChange(p) {

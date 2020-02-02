@@ -462,7 +462,6 @@ const outcolumns = [
     align: "center"
   }
 ];
-
 const convertToTreeData = (data, pid) => {
   let result = [],
     temp;
@@ -697,6 +696,7 @@ export default {
     async init() {
       this.spinning = true;
       let resProject = await this.getProject();
+      if(!resProject) this.spinning = false;
       this.checkLength(resProject);
       this.optionsProject = resProject;
       if (this.apiPageType == false || this.apiPageIsCopy) {

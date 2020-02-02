@@ -3,7 +3,7 @@ import { message } from 'vcu';
 
 // 创建一个AXIOS实例 (请求不同服务器地址或超时时长等等可以创建不同的实例)
 const request = axios.create({
-    baseURL: 'http://10.16.3.197:8033', //请求的域名基本地址     process.env.VUE_APP_BASE_API, // url = base url + request url     
+    baseURL: '', //请求的域名基本地址     process.env.VUE_APP_BASE_API, // url = base url + request url     http://localhost:8033
     // withCredentials: true, // 跨域请求时发送cookies
     timeout: 8000 // 请求超时
 })

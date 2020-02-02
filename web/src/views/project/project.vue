@@ -425,7 +425,11 @@ export default {
       });
     },
     //添加子级模块
-    handleAddChildModule(record) {},
+    handleAddChildModule(record) {
+      this.modModalType = true;
+      this.modleVisible = true;
+      this.formModle.pmid = record.mid.toString()
+    },
     //删除模块
     handleDeleteModule(record) {
       let _this = this;

@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <div>
     <div class="clearfix margin-bottom-5">
       <v-button
         size="small"
@@ -11,7 +11,6 @@
     <v-table
       bordered
       size="middle"
-      :rowKey="record => record.key"
       :columns="incolumns"
       :dataSource="formValidate2.headerVal"
       :pagination="false"
@@ -20,9 +19,9 @@
       <template slot="operation" slot-scope="text, record, index">
         <div class="editable-row-operations">
           <v-button-group size="small">
-            <v-button @click="() => handleAddIn('header',record)" v-if="!record.children && !record.pid">添加</v-button>
-            <v-button @click="() => handleEidtIn('header',record)">编辑</v-button>
-            <v-button @click="() => handleDeleteIn('header',record)">删除</v-button>
+            <v-button @click="() => handleAddIn('header',record,index)">添加</v-button>
+            <v-button @click="() => handleEidtIn('header',record,index)">编辑</v-button>
+            <v-button @click="() => handleDeleteIn('header',record,index)">删除</v-button>
           </v-button-group>
         </div>
       </template>
@@ -30,9 +29,9 @@
 
     <v-modal v-model="invisible" title="参数说明" :maskClosable="false" @cancel="handleCancelInModal">
       <template slot="footer">
-        <v-button key="back" @click="handleCancelInModal">关闭</v-button>
-        <v-button key="next" type="primary" @click="handleInModal()" v-if="!isEditModalIn">保存并下一条</v-button>
-        <v-button key="submit" type="primary" @click="handleInEditModal()" v-if="isEditModalIn">保存</v-button>
+        <v-button key="back" @click="handleCancelInModal">取消</v-button>
+        <v-button key="next" type="primary" @click="handleInModal(false)" v-if="inModalNext">下一条</v-button>
+        <v-button key="submit" type="primary" @click="handleInModal(true)">完成</v-button>
       </template>
       <v-form ref="formInModal" :model="formInModal" :rules="ruleInModal" :label-width="60">
         <v-form-item label="参数名" prop="name">
@@ -52,11 +51,10 @@
         </v-form-item>
       </v-form>
     </v-modal>
-  </v-card>
+  </div>
 </template>
 
 <script>
-import uuidv1 from "uuid/v1";
 const dataType = [
   {
     label: "Int",
@@ -128,6 +126,7 @@ const incolumns = [
   }
 ];
 export default {
+  name: "params-desc",
   data() {
     return {
       incolumns,
@@ -136,8 +135,9 @@ export default {
       },
 
       inModalType: "",
+      inModalNext: true,
       invisible: false,
-      isEditModalIn: false,
+      inModalIndex: null,
       formInModal: {
         name: "",
         type: "",
@@ -174,111 +174,22 @@ export default {
   methods: {
     //入参显示窗口
     handleClickInModal(type) {
-      this.isEditModalIn = false;
-      this.inModalType = type;
       this.invisible = true;
     },
     //入参添加子级
-    handleAddIn(type, record) {
-      this.inModalType = type;
-      this.isEditModalIn = false;
-      this.invisible = true;
-      
-    },
+    handleAddIn(type, record, index) {},
     //入参编辑
-    handleEidtIn(type, record) {
-      this.isEditModalIn = true;
-      this.inModalType = type;
-      this.invisible = true;
-      this.$nextTick(() => {
-        this.formInModal = Object.assign({}, this.formInModal, record);
-      });
-    },
+    handleEidtIn(type, record, index) {},
     //入参删除
-    handleDeleteIn(type, record) {
-      switch (type) {
-        case "header":
-          const dataSource = [...this.formValidate2.headerVal];
-          this.formValidate2.headerVal = dataSource.filter(
-            item => item.key !== record.key
-          );
-          break;
-
-        case "get":
-          break;
-
-        case "body":
-          break;
-      }
-    },
+    handleDeleteIn(type, record, index) {},
     //入参取消窗口
-    handleCancelInModal() {
+    handleCancelInModal(){
       this.$refs["formInModal"].resetFields();
       this.invisible = false;
     },
-    //入参保存编辑
-    handleInEditModal() {
-      this.$refs["formInModal"].validate(valid => {
-        if (valid) {
-          let newData = {
-            name: this.formInModal.name,
-            type: this.formInModal.type,
-            must: this.formInModal.must,
-            desc: this.formInModal.desc
-          };
-          switch (this.inModalType) {
-            case "header":
-              const dataSource = [...this.formValidate2.headerVal];
-              this.formValidate2.headerVal = dataSource.map(item => {
-                if(item.key == this.formInModal.key){
-                  item = Object.assign({}, item, newData);
-                }
-                return item
-              })
-              break;
+    //入参下一步、完成窗口
+    handleInModal(){
 
-            case "get":
-              break;
-
-            case "body":
-              break;
-          }
-          this.handleCancelInModal()
-        } else {
-          this.$message.error("验证失败!");
-        }
-      });
-    },
-    //新增入参窗口
-    handleInModal() {
-      this.$refs["formInModal"].validate(valid => {
-        if (valid) {
-          let newData = {
-            key: uuidv1(),
-            name: this.formInModal.name,
-            type: this.formInModal.type,
-            must: this.formInModal.must,
-            desc: this.formInModal.desc
-          };
-          switch (this.inModalType) {
-            case "header":
-              this.formValidate2.headerVal = [
-                ...this.formValidate2.headerVal,
-                newData
-              ];
-              break;
-
-            case "get":
-              break;
-
-            case "body":
-              break;
-          }
-          this.$refs["formInModal"].resetFields();
-        } else {
-          this.$message.error("验证失败!");
-        }
-      });
     }
   },
   mounted() {}
