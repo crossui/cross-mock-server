@@ -20,7 +20,10 @@
       <template slot="operation" slot-scope="text, record, index">
         <div class="editable-row-operations">
           <v-button-group size="small">
-            <v-button @click="() => handleAddIn('header',record)" v-if="!record.children && !record.pid">添加</v-button>
+            <v-button
+              @click="() => handleAddIn('header',record,index)"
+              v-if="!record.children && !record.pid"
+            >添加</v-button>
             <v-button @click="() => handleEidtIn('header',record)">编辑</v-button>
             <v-button @click="() => handleDeleteIn('header',record)">删除</v-button>
           </v-button-group>
@@ -183,15 +186,16 @@ export default {
       this.inModalType = type;
       this.isEditModalIn = false;
       this.invisible = true;
-      
     },
     //入参编辑
     handleEidtIn(type, record) {
       this.isEditModalIn = true;
       this.inModalType = type;
       this.invisible = true;
+      console.info(this.formInModal)
       this.$nextTick(() => {
         this.formInModal = Object.assign({}, this.formInModal, record);
+      console.info(this.formInModal)
       });
     },
     //入参删除
@@ -230,11 +234,11 @@ export default {
             case "header":
               const dataSource = [...this.formValidate2.headerVal];
               this.formValidate2.headerVal = dataSource.map(item => {
-                if(item.key == this.formInModal.key){
+                if (item.key == this.formInModal.key) {
                   item = Object.assign({}, item, newData);
                 }
-                return item
-              })
+                return item;
+              });
               break;
 
             case "get":
@@ -243,7 +247,7 @@ export default {
             case "body":
               break;
           }
-          this.handleCancelInModal()
+          this.handleCancelInModal();
         } else {
           this.$message.error("验证失败!");
         }
