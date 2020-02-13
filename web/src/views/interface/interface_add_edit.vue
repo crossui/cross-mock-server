@@ -232,9 +232,9 @@
                 v-if="respondJsonValidate && roleValidate3"
               >不能为空,或JSON格式有错误</div>
             </v-form-item>
-            <v-form-item label="返回状态码" prop="rcode">
+            <!-- <v-form-item label="返回状态码" prop="rcode">
               <v-input v-model="formValidate3.rcode" style="width:200px"></v-input>
-            </v-form-item>
+            </v-form-item> -->
             <v-form-item label="开启mockjs" prop="ismock">
               <v-radio-group v-model="formValidate3.ismock">
                 <v-radio value="0">开启</v-radio>
@@ -561,8 +561,8 @@ export default {
         headerJson: null,
         respondJson: null,
         ismock: "0",
-        lazytime: 0,
-        rcode: "200"
+        //rcode: "200",
+        lazytime: 0
       },
       ruleValidateCheck3: {
         ismock: [
@@ -577,14 +577,14 @@ export default {
             message: "不能为空"
           }
         ],
-        rcode: [
+        /* rcode: [
           {
             required: true,
             message: "不能为空",
             trigger: "blur"
           },
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
-        ]
+        ] */
       },
       roleValidate3: false,
       respondJsonValidate: false,
@@ -744,7 +744,7 @@ export default {
       this.formValidate3.respondJson = res.api_content;
       this.formValidate3.ismock = res.is_mockjs.toString();
       this.formValidate3.lazytime = res.api_lazy_time;
-      this.formValidate3.rcode = res.rcode;
+      //this.formValidate3.rcode = res.rcode;
     },
     //获取项目
     async getProject() {
@@ -1126,7 +1126,7 @@ export default {
         ismockjs: parseInt(this.formValidate3.ismock),
         apireqheader: JSON.stringify(this.formValidate3.headerJson),
         apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
-        rcode: this.formValidate3.rcode,
+        //rcode: this.formValidate3.rcode,
         apilazytime: this.formValidate3.lazytime
       };
       let method = "POST";

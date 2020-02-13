@@ -38,6 +38,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import JsonViewer from "vue-json-viewer";
 
 const optionsApiType = type => {
@@ -106,7 +107,22 @@ export default {
     },
     handleSend(value) {
       this.spinning = true;
-      this.$request({
+
+      axios({
+        method: this.apiType,
+        url: `${this.apiPrefix}${this.apiUrl}`,
+        timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000
+      })
+        .then(res => {
+          this.jsonHeaders = res.headers;
+          this.jsonBody = res.data;
+          this.spinning = false;
+        })
+        .catch(err => {
+          this.spinning = false;
+        });
+
+      /* this.$request({
         method: this.apiType,
         url: `${this.apiPrefix}${this.apiUrl}`,
         timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000
@@ -123,7 +139,7 @@ export default {
         })
         .catch(err => {
           this.spinning = false;
-        });
+        }); */
     }
   }
 };

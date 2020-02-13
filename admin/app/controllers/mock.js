@@ -44,7 +44,7 @@ class MockCtl {
           if (rows[0].api_lazy_time > 0) {
             await settimeoutResult(rows[0].api_lazy_time)
           }
-          ctx.body = { message: "MOCK成功", data: result, code: rows[0].rcode }
+          ctx.body = result; // { message: "MOCK成功", data: result, code: rows[0].rcode }
         } else {
           ctx.body = { message: "该接口地址不存在", code: 204 }
         }
