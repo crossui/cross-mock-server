@@ -36,8 +36,8 @@ class InterfaceCtl {
       apireqheader: { type: 'string', required: false },
       apireqheaderdesc: { type: 'string', required: false },
       createtime: { type: 'string', required: false },
-      apistatus: { type: 'string', required: true },
-      rcode: { type: 'string', required: true }
+      //rcode: { type: 'string', required: true },
+      apistatus: { type: 'string', required: true }
     });
     const { apiname, apiurl, projectid, moduleid } = ctx.request.body;
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });

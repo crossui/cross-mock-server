@@ -9,7 +9,11 @@
       <v-layout-header style="background: #fff; padding: 0">
         <div class="clearfix">
           <div class="navicon-con fl">
-            <v-icon class="trigger" :type="collapsed ? 'indent' : 'outdent'" @click="()=> collapsed = !collapsed"></v-icon>
+            <v-icon
+              class="trigger"
+              :type="collapsed ? 'indent' : 'outdent'"
+              @click="()=> collapsed = !collapsed"
+            ></v-icon>
           </div>
           <div class="breadcrumb-con fl">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
@@ -20,7 +24,7 @@
                 <v-icon type="reload" :size="22"></v-icon>
               </v-tooltip>
             </div>
-            <v-row type="flex" justify="end" align="middle" class="user-dropdown-innercon margin-left-20">
+            <!-- <v-row type="flex" justify="end" align="middle" class="user-dropdown-innercon margin-left-20">
               <v-dropdown placement="bottomRight">
                 <a class="user-name" href="javascript:void(0)">
                   <span class="main-user-name">{{ userName }}</span>
@@ -32,7 +36,7 @@
                 </v-menu>
               </v-dropdown>
               <v-avatar style="background-color: #2d8cf0" icon="user" class="margin-left-10"></v-avatar>
-            </v-row>
+            </v-row>-->
           </div>
         </div>
       </v-layout-header>
@@ -52,13 +56,12 @@
 </template>
 
 <script>
-import SideMenu from './components/side-menu'
-import menuClock from './components/menu-clock'
+import SideMenu from "./components/side-menu";
+import menuClock from "./components/menu-clock";
 import breadcrumbNav from "./components/breadcrumb-nav";
 
 import Cookies from "js-cookie";
 import util from "@/libs/util.js";
-
 
 export default {
   components: {
@@ -71,7 +74,7 @@ export default {
       loadingRefresh: true,
       collapsed: false,
       userName: "admin"
-    }
+    };
   },
   computed: {
     menuList() {
@@ -90,12 +93,11 @@ export default {
     }
   },
   mounted() {
-    this.userName = Cookies.get("user");
-
+    //this.userName = Cookies.get("user");
+    Cookies.set("roles", "general");
     util.setCurrentPath(this, this.$route);
-
     this.$store.commit("updateMenulist");
-    this.$store.commit("setMessageCount", 3);
+    //this.$store.commit("setMessageCount", 3);
   },
   methods: {
     handleClickUserDropdown(name) {
@@ -104,11 +106,13 @@ export default {
           name: "ownspace_index"
         });
       } else {
-        this.$store.commit("setTagNavList", [{
-          title: '首页',
-          path: '/',
-          name: 'home_index'
-        }]);
+        this.$store.commit("setTagNavList", [
+          {
+            title: "首页",
+            path: "/",
+            name: "home_index"
+          }
+        ]);
         this.$store.commit("logout", this);
         this.$router.push({
           name: "login"
@@ -119,7 +123,7 @@ export default {
       util.domReset(this, "loadingRefresh");
     }
   }
-}
+};
 </script>
 <style lang="less">
 @import "./main.less";

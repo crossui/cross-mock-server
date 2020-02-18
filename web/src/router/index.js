@@ -16,13 +16,15 @@ export const router = new VueRouter(RouterConfig);
 
 router.beforeEach((to, from, next) => {
     NProgress.start()
-    if (!Cookies.get('user') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
+    /* if (!Cookies.get('user') && to.name !== 'login') { // 判断是否已经登录且前往的页面不是登录页
         next({
             name: 'login'
         });
     } else {
         next();
-    }
+    } */
+
+    next();
 });
 
 router.afterEach((to) => {
