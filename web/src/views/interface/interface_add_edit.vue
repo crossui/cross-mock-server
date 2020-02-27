@@ -2,12 +2,22 @@
   <v-spin :spinning="spinning">
     <div class="card-container">
       <v-tabs type="card" v-model="selectTab" @change="onTabsChange">
+        <template slot="tabBarExtraContent">
+          <v-button-group size="small">
+            <v-button type="primary" @click="handleDownTpl">
+              <v-icon type="cloud-download"></v-icon>下载模板
+            </v-button>
+            <v-button type="primary" @click="handleSelectFile">
+              <v-icon type="cloud-upload"></v-icon>导入Excel
+            </v-button>
+          </v-button-group>
+        </template>
         <v-tab-pane tab="基本信息" key="1">
           <v-form
             ref="formValidate1"
             :model="formValidate1"
             :rules="ruleValidate1"
-            :label-width="100"
+            :label-width="120"
           >
             <v-form-item label="所属项目" prop="projectid">
               <v-select
@@ -70,7 +80,7 @@
         </v-tab-pane>
 
         <v-tab-pane tab="请求参数设置" key="2">
-          <v-form ref="formValidate2" :model="formValidate2" :label-width="100">
+          <v-form ref="formValidate2" :model="formValidate2" :label-width="120">
             <v-form-item label="Header参数说明">
               <div class="clearfix margin-bottom-5">
                 <v-button
@@ -234,7 +244,7 @@
             </v-form-item>
             <!-- <v-form-item label="返回状态码" prop="rcode">
               <v-input v-model="formValidate3.rcode" style="width:200px"></v-input>
-            </v-form-item> -->
+            </v-form-item>-->
             <v-form-item label="开启mockjs" prop="ismock">
               <v-radio-group v-model="formValidate3.ismock">
                 <v-radio value="0">开启</v-radio>
@@ -308,14 +318,15 @@
         </v-form>
       </v-modal>
     </div>
+    <iframe name="myIframe" style="display:none"></iframe>
+    <input type="file" id="file" style="display:none" @change="importFile" />
   </v-spin>
 </template>
 
 <script>
 import Util from "@/libs/util";
+import Excels from "@/libs/excel";
 import jsoneditor from "jsoneditor";
-/////
-//import FileReader from "filereader";
 const dataType = [
   {
     label: "Int",
@@ -576,7 +587,7 @@ export default {
             required: true,
             message: "不能为空"
           }
-        ],
+        ]
         /* rcode: [
           {
             required: true,
@@ -696,7 +707,7 @@ export default {
     async init() {
       this.spinning = true;
       let resProject = await this.getProject();
-      if(!resProject) this.spinning = false;
+      if (!resProject) this.spinning = false;
       this.checkLength(resProject);
       this.optionsProject = resProject;
       if (this.apiPageType == false || this.apiPageIsCopy) {
@@ -799,10 +810,14 @@ export default {
       this.jsoneditorHeader = new jsoneditor(containerHeader, optionsHeader);
       this.jsoneditorRespond = new jsoneditor(containerRespond, optionsRespond);
 
-      if (this.apiPageType == false || this.apiPageIsCopy) {
+      this.formValidate3.headerJson != null &&
+        this.jsoneditorHeader.set(JSON.parse(this.formValidate3.headerJson));
+      this.formValidate3.respondJson != null &&
+        this.jsoneditorRespond.set(JSON.parse(this.formValidate3.respondJson));
+      /* if (this.apiPageType == false || this.apiPageIsCopy) {
         this.jsoneditorHeader.set(JSON.parse(this.formValidate3.headerJson));
         this.jsoneditorRespond.set(JSON.parse(this.formValidate3.respondJson));
-      }
+      } */
     },
     //切换面板的回调
     onTabsChange(activeKey) {
@@ -1137,7 +1152,6 @@ export default {
         method = "PATCH";
         url = `/interfaces/${this.mockId}`;
       }
-      console.info(data);
 
       this.spinning = true;
       this.$request({
@@ -1162,6 +1176,110 @@ export default {
       /* console.info(this.formValidate1);
       console.info(this.formValidate2);
       console.info(this.formValidate3); */
+    },
+    //下载模板
+    handleDownTpl() {
+      window.open(`/mockServe_interface_tpl.xls`, 'myIframe');
+    },
+    //导入excel
+    handleSelectFile() {
+      const el = document.getElementById("file");
+      el.click();
+    },
+    async importFile() {
+      const el = document.getElementById("file");
+      const file = el.files[0];
+      const data = await Excels.importFromLocal(file);
+      this.handleExcelData(data);
+    },
+    handleExcelData(data) {
+      try {
+        /* 基本信息 */
+        this.formValidate1.apiname = data[0][0]["接口名称"];
+        this.formValidate1.apitype = data[0][0]["请求类型"];
+        this.formValidate1.apiurl = data[0][0]["接口地址"];
+        this.formValidate1.apidesc = data[0][0]["接口描述"];
+        /* 响应参数说明 */
+        this.formValidate3.respondVal = data[1].map(item => {
+          return {
+            name: item["返回键"],
+            type: item["类型"],
+            value: item["返回值"],
+            desc: item["说明"]
+          };
+        });
+        /* 响应数据 */
+        this.formValidate3.respondJson = data[2][0]["响应数据"];
+        //this.jsoneditorHeader.set(JSON.parse(this.formValidate3.headerJson));
+        this.selectTab == "3" &&
+          this.jsoneditorRespond.set(
+            JSON.parse(this.formValidate3.respondJson)
+          );
+        /* 响应Header参数说明 */
+        this.formValidate3.headerVal =
+          data[3].length == 0
+            ? []
+            : data[3].map(item => {
+                return {
+                  name: item["返回键"],
+                  type: item["类型"],
+                  value: item["返回值"],
+                  desc: item["说明"]
+                };
+              });
+        /* 响应Header数据 */
+        this.formValidate3.headerJson = data[4][0]["响应数据"];
+        this.selectTab == "3" &&
+          this.jsoneditorHeader.set(JSON.parse(this.formValidate3.headerJson));
+
+        /* formValidate2: {
+          headerVal: [],
+          getVal: [],
+          bodyVal: []
+          name: this.formReModal.name,
+            type: this.formReModal.type,
+            value: this.formReModal.value,
+            desc: this.formReModal.desc
+        }, */
+        /* Header参数说明 */
+        this.formValidate2.headerVal =
+          data[5].length == 0
+            ? []
+            : data[5].map(item => {
+                return {
+                  name: item["参数名"],
+                  type: item["类型"],
+                  must: item["必填"],
+                  desc: item["说明"]
+                };
+              });
+        /* Get参数说明 */
+        this.formValidate2.getVal =
+          data[6].length == 0
+            ? []
+            : data[6].map(item => {
+                return {
+                  name: item["参数名"],
+                  type: item["类型"],
+                  must: item["必填"],
+                  desc: item["说明"]
+                };
+              });
+        /* body参数说明 */
+        this.formValidate2.bodyVal =
+          data[7].length == 0
+            ? []
+            : data[7].map(item => {
+                return {
+                  name: item["参数名"],
+                  type: item["类型"],
+                  must: item["必填"],
+                  desc: item["说明"]
+                };
+              });
+      } catch (error) {
+        alert(error);
+      }
     }
   }
 };

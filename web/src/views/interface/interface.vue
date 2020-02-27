@@ -1,6 +1,16 @@
 <template>
   <div>
     <v-card :title="titleVal">
+      <template slot="extra" v-if="isModel">
+        <v-button-group size="small">
+          <v-button type="primary" @click="handleDownTpl">
+            <v-icon type="cloud-download"></v-icon>下载模板
+          </v-button>
+          <v-button type="primary" @click="handleShowFileModal">
+            <v-icon type="cloud-upload"></v-icon>批量导入接口
+          </v-button>
+        </v-button-group>
+      </template>
       <div class="clearfix margin-bottom-15">
         <div class="fl">
           <v-input-search
@@ -40,11 +50,44 @@
         </template>
       </v-table>
     </v-card>
+
+    <v-modal
+      title="批量导入接口"
+      v-model="visibleFile"
+      @cancel="handleCancelVisibleFile"
+      @ok="handleOkVisibleFile"
+    >
+      <v-row class="vcu-form-item-required margin-bottom-20">
+        <v-col :span="4" class="vcu-form-item-label">基础表：</v-col>
+        <v-col :span="20">
+          <v-button size="small" type="primary" @click="handleSelectFile('1')">导入</v-button>
+          <span class="margin-left-10">{{filename.one}}</span>
+        </v-col>
+      </v-row>
+      <v-row class="vcu-form-item-required margin-bottom-20">
+        <v-col :span="4" class="vcu-form-item-label">出参表：</v-col>
+        <v-col :span="20">
+          <v-button size="small" type="primary" @click="handleSelectFile('2')">导入</v-button>
+          <span class="margin-left-10">{{filename.two}}</span>
+        </v-col>
+      </v-row>
+      <v-row class="vcu-form-item-required margin-bottom-20">
+        <v-col :span="4">入参表：</v-col>
+        <v-col :span="20">
+          <v-button size="small" type="primary" @click="handleSelectFile('3')">导入</v-button>
+          <span class="margin-left-10">{{filename.thr}}</span>
+        </v-col>
+      </v-row>
+    </v-modal>
+
+    <iframe name="myIframe" style="display:none"></iframe>
+    <input type="file" id="file" style="display:none" @change="importFile" />
   </div>
 </template>
 
 <script>
 import Util from "@/libs/util";
+import Excels from "@/libs/excel";
 const apiTypeFun = type => {
   let _type = "";
   switch (type) {
@@ -87,10 +130,31 @@ const apistatusFun = status => {
   }
   return _status;
 };
+const renderFileArr = (data) => {
+  let _data = [];
+  
+
+  return _data;
+};
 export default {
   name: "interface_index",
   data() {
     return {
+      visibleFile: false,
+      importFileType: "",
+      filename: {
+        one: "",
+        two: "",
+        thr: ""
+      },
+      fileVal: {
+        one: [],
+        tow: [],
+        thr: []
+      },
+      importFileAllVal:[],
+
+      isModel: false,
       titleVal: "全部接口",
       searchVal: "",
       data: [],
@@ -156,8 +220,10 @@ export default {
     $route: {
       handler(route) {
         if (this.moduleid != undefined) {
+          this.isModel = true;
           this.getInvolv();
         } else {
+          this.isModel = false;
           this.titleVal = "全部接口";
         }
         this.fetch(1);
@@ -273,7 +339,47 @@ export default {
             });
         }
       });
-    }
+    },
+
+    async importFile() {
+      const el = document.getElementById("file");
+      const file = el.files[0];
+      const data = await Excels.importFromLocal(file);
+      switch(this.importFileType){
+        case "1":
+          this.filename.one = file.name;
+          this.fileVal.one = data;
+          break;
+
+        case "2":
+          this.filename.two = file.name;
+          this.fileVal.two = data;
+          break;
+
+        case "3":
+          this.filename.thr = file.name;
+          this.fileVal.thr = data;
+          break;
+      }
+    },
+    //下载模板
+    handleDownTpl() {
+      window.open(`/mockServe_interface_tpl.xls`, "myIframe");
+    },
+    //导入excel
+    handleSelectFile(type) {
+      this.importFileType = type
+      const el = document.getElementById("file");
+      el.click();
+    },
+    //显示选择文件窗口
+    handleShowFileModal() {
+      this.visibleFile = true;
+    },
+    //批量导入接口窗口关闭
+    handleCancelVisibleFile() {},
+    //批量导入接口窗口确认
+    handleOkVisibleFile() {}
   }
 };
 </script>
