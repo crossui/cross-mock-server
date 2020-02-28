@@ -1160,12 +1160,17 @@ export default {
         data
       })
         .then(res => {
-          if (res) {
+          if (res.code == 200) {
             this.$router.push({
               name: "interface_success",
               query: {
                 mockid: res.data.insertId
               }
+            });
+          } else {
+            this.$error({
+              title: "错误",
+              content: res.message
             });
           }
           this.spinning = false;
@@ -1179,7 +1184,7 @@ export default {
     },
     //下载模板
     handleDownTpl() {
-      window.open(`/mockServe_interface_tpl.xls`, 'myIframe');
+      window.open(`/mockServe_interface_tpl.xls`, "myIframe");
     },
     //导入excel
     handleSelectFile() {

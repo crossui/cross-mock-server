@@ -88,10 +88,10 @@ class InterfaceCtl {
 
     //更新
     const res = await DB.findByIdAndUpdate(ctx.params.id, ctx.request.body);
-    if (!res) { 
-      ctx.body = { message: "接口不存在", code: 204 }; 
+    if (!res) {
+      ctx.body = { message: "接口不存在", code: 204 };
     } else {
-      ctx.body = { message: "修改成功", data: {insertId: ctx.params.id}, code: 200 };
+      ctx.body = { message: "修改成功", data: { insertId: ctx.params.id }, code: 200 };
 
     }
   };
@@ -103,6 +103,36 @@ class InterfaceCtl {
     } else {
       ctx.body = { message: "删除成功", code: 200 };
 
+    }
+  };
+
+  //批量创建数据
+  async batchAdd(ctx) {
+    ctx.verifyParams({
+      allInterface: { type: 'string', required: true },
+    })
+    const { allInterface } = ctx.request.body;
+    const requestBody = JSON.parse(allInterface)
+
+
+    let repeated, interfacesId;
+    for (let i = 0; i < requestBody.length; i++) {
+      const { apiname, apiurl, projectid, moduleid } = requestBody[i];
+      repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
+      if (repeated) {
+        interfacesId = i
+        break;
+      }
+    }
+    if (repeated) {
+      ctx.body = { message: `接口ID：${interfacesId + 1} 的名称或地址已经存在`, code: 409 }
+    } else {
+      let res = await DB.batchcreate(requestBody)
+      if (res) {
+        ctx.body = { message: "批量导入成功", code: 200 };
+      } else {
+        ctx.body = { message: "批量导入失败", code: 201 };
+      }
     }
   };
 }

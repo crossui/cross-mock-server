@@ -17,14 +17,40 @@ async function create(obj) {
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status,rcode) 
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
     values 
     ('${obj.projectid}','${obj.moduleid}','${obj.apiname}','${obj.apiurl}'
     ,'${obj.apicontent}','${obj.apicontentdesc}','${obj.apiheaderdesc}','${obj.apiparmsdesc}'
     ,'${obj.apibodydesc}','${obj.apitype}','${obj.ismockjs}','${obj.apilazytime}'
-    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}','${obj.rcode}')`;
+    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}')`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
+            return res
+        } else {
+            return false
+        }
+    })
+}
+
+
+//批量创建
+async function batchcreate(obj) {
+    let valuesText = '';
+    obj.forEach(item => {
+        valuesText += `('${item.projectid}','${item.moduleid}','${item.apiname}','${item.apiurl}'
+        ,'${item.apicontent}','${item.apicontentdesc}','${item.apiheaderdesc}','${item.apiparmsdesc}'
+        ,'${item.apibodydesc}','${item.apitype}','${item.ismockjs}','${item.apilazytime}'
+        ,'${item.apidesc}','${item.createtime}','${item.apireqheader}','${item.apireqheaderdesc}','${item.apistatus}'),`
+    })
+    valuesText = valuesText.substr(0,valuesText.length-1);
+    let sql = `insert into cross_interface 
+    (projectid,moduleid,api_name,api_url,api_content,
+        api_content_desc,api_header_desc,api_parms_desc,
+        api_body_desc,api_type,is_mockjs,api_lazy_time,
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
+    values ${valuesText}`;
+    return allSqlAction.allSqlAction(sql).then(res => {
+        if (res.affectedRows >= 1) {
             return res
         } else {
             return false
@@ -121,7 +147,7 @@ async function findByIdAndRemove(id) {
 }
 
 //根据项目ID删除
-async function findByPidAndRemove(id){
+async function findByPidAndRemove(id) {
     let sql = `delete from cross_interface WHERE projectid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         return res.affectedRows
@@ -129,7 +155,7 @@ async function findByPidAndRemove(id){
 }
 
 //根据模块ID删除
-async function findByMidAndRemove(id){
+async function findByMidAndRemove(id) {
     let sql = `delete from cross_interface WHERE moduleid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         return res.affectedRows
@@ -142,6 +168,7 @@ module.exports = {
     findByMockid,
     findByPid,
     create,
+    batchcreate,
     findByIdAndUpdate,
     findByIdAndRemove,
     findByPidAndRemove,

@@ -5,7 +5,8 @@ const {
     create,
     update,
     delete: del,
-    findByMockid
+    findByMockid,
+    batchAdd
 } = require('../controllers/interfaces');
 
 
@@ -18,5 +19,7 @@ router.post('/', create); //创建数据
 router.patch('/:id', update); //更新数据
 
 router.post('/delete', del); //删除数据
+
+router.post('/batchAdd', batchAdd); //批量创建数据
 
 module.exports = router;
