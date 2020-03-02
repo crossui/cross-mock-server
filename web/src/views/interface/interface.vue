@@ -165,7 +165,6 @@ const renderFileArr = (data, pid, mid) => {
       apistatus: "2",
       apiheaderdesc: "[]",
       apiparmsdesc: "[]",
-      apicontent: JSON.stringify({ status: 200, title: "ok", payload: [] }),
       ismockjs: 0,
       apireqheader: "{}",
       apireqheaderdesc: "[]",
@@ -194,6 +193,30 @@ const renderFileArr = (data, pid, mid) => {
             desc: itemthr["说明"]
           });
         }
+      });
+    }
+
+    if (data[3].length) {
+      data[3].forEach(itemfou => {
+        if (itemfou["接口ID"] == itemone["接口ID"]) {
+          if (itemfou["响应数据"] != undefined && itemfou["响应数据"] != "") {
+            res.apicontent = itemfou["响应数据"];
+          } else {
+            res.apicontent = JSON.stringify({
+              status: 200,
+              title: "ok",
+              payload: []
+            });
+          }
+        }
+      });
+    }
+
+    if (res.apicontent == undefined) {
+      res.apicontent = JSON.stringify({
+        status: 200,
+        title: "ok",
+        payload: []
       });
     }
 
