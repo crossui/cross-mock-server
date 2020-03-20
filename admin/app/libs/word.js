@@ -149,7 +149,7 @@ const renderInTableArray = (arr) => {
     try {
         let _arr = JSON.parse(arr)
         _arr.forEach(item => {
-            table.push([item.name, item.type, item.value, item.desc])
+            table.push([item.name, item.type, item.must, item.desc])
         })
     } catch (err) {
 
@@ -163,7 +163,7 @@ const renderOutTableArray = (arr) => {
     try {
         let _arr = JSON.parse(arr)
         _arr.forEach(item => {
-            table.push([item.name, item.type, item.must, item.desc])
+            table.push([item.name, item.type, item.value, item.desc])
         })
     } catch (err) {
 
@@ -207,7 +207,6 @@ async function generate(result) {
             let httptypeObj = myDoc.createP()
             httptypeObj.addText(`${protIndex}.${++i} HTTP请求方式：`, { font_size: 14 });
             httptypeObj.addText(`${apiTypeFun(item.api_type)}`, { font_size: 12 });
-
             //请求Header参数说明
             if (item.api_header_desc !== "[]") {
                 let inHeaderDescObj = myDoc.createP()

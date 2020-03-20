@@ -8,7 +8,7 @@ let util = {};
  * @param dataName 控制DOM节点是否展示的DATA变量（v-if）
  * @param callBack 重绘后的回调
  **/
-util.domReset = function(vm, dataName, callBack) {
+util.domReset = function (vm, dataName, callBack) {
     vm[dataName] = false;
     vm.$nextTick(() => {
         vm[dataName] = true;
@@ -24,8 +24,8 @@ util.domReset = function(vm, dataName, callBack) {
  * @param format 日期格式
  * @return 例如  2016-7-16 16:24:58 
  **/
-util.formatDate = function(date, format) {
-    let paddNum = function(num) {
+util.formatDate = function (date, format) {
+    let paddNum = function (num) {
         num += "";
         return num.replace(/^(\d)$/, "0$1");
     };
@@ -43,7 +43,7 @@ util.formatDate = function(date, format) {
         ms: paddNum(date.getMilliseconds()) //毫秒 : 如果1位的时候补0
     }
     format || (format = "yyyy-MM-dd hh:mm:ss");
-    return format.replace(/([a-z])(\1)*/ig, function(m) { return cfg[m]; });
+    return format.replace(/([a-z])(\1)*/ig, function (m) { return cfg[m]; });
 }
 
 /**
@@ -51,7 +51,7 @@ util.formatDate = function(date, format) {
  * @param {*} name 路由名
  * @description 返回路由对象
  */
-util.getRouterObjByName = function(routers, name) {
+util.getRouterObjByName = function (routers, name) {
     if (!name || !routers || !routers.length) {
         return null;
     }
@@ -72,7 +72,7 @@ util.getRouterObjByName = function(routers, name) {
  * @param {*} item 对象
  * @description 更新当前面包屑
  */
-util.setCurrentPath = function(vm, items) {
+util.setCurrentPath = function (vm, items) {
     const name = items.name
     const homeTitle = '首页'
     let title = ''
@@ -105,15 +105,15 @@ util.setCurrentPath = function(vm, items) {
         }];
     } else if ((name.indexOf('_index') >= 0 || isOtherRouter) && name !== 'home_index') {
         currentPathArr = [{
-                title: homeTitle,
-                path: '/home',
-                name: 'home_index'
-            },
-            {
-                title: items.meta.title,
-                path: '',
-                name: name
-            }
+            title: homeTitle,
+            path: '/home',
+            name: 'home_index'
+        },
+        {
+            title: items.meta.title,
+            path: '',
+            name: name
+        }
         ];
     } else {
         currentPathArr = [{
@@ -139,7 +139,7 @@ util.setCurrentPath = function(vm, items) {
  * @param {*} vm 对象
  * @description 返回路由TITLE
  */
-util.showTitle = function(item, vm) {
+util.showTitle = function (item, vm) {
     let _title = '';
     if (item.meta && item.meta.title) {
         _title = item.meta.title
@@ -160,7 +160,7 @@ util.objEqual = (obj1, obj2) => {
     const keysArr2 = Object.keys(obj2)
     if (keysArr1.length !== keysArr2.length) return false
     else if (keysArr1.length === 0 && keysArr2.length === 0) return true
-        /* eslint-disable-next-line */
+    /* eslint-disable-next-line */
     else return !keysArr1.some(key => obj1[key] != obj2[key])
 };
 
@@ -170,7 +170,7 @@ util.objEqual = (obj1, obj2) => {
  * @param {*} route1 路由对象
  * @param {*} route2 路由对象
  */
-util.routeEqual = function(route1, route2) {
+util.routeEqual = function (route1, route2) {
     return route1.name === route2.name
 };
 
@@ -230,12 +230,26 @@ util.colsePage = (vm, name) => {
  * @param page 服务器返回分页数据
  * @return data 
  **/
-util.pager = function(vm, pagination, page) {
-    const pager = {...pagination };
+util.pager = function (vm, pagination, page) {
+    const pager = { ...pagination };
     pager.current = page.current;
     pager.total = page.total;
     return pager;
 };
 
+/** 
+ * 批量替换单引号 
+ * @param str   
+ **/
+util.replaceSingleQuotes = function (str) {
+    return str.replace(/\'/g, "’");
+};
 
+/** 
+ * 批量替换双引号 
+ * @param str   
+ **/
+util.replaceDoubleQuotes = function (str) {
+    return str.replace(/\"/g, "”");
+};
 export default util;

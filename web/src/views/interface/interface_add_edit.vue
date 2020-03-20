@@ -317,6 +317,7 @@
           </v-form-item>
         </v-form>
       </v-modal>
+      
     </div>
     <iframe name="myIframe" style="display:none"></iframe>
     <input type="file" id="file" style="display:none" @change="importFile" />
@@ -493,6 +494,12 @@ const convertToTreeData = (data, pid) => {
 
   return result;
 };
+
+const replaceFun = val => {
+  let _val = val.replace(/\'/g, "");
+  _val = _val.replace(/\"/g, "");
+  return _val;
+};
 export default {
   data() {
     return {
@@ -640,6 +647,9 @@ export default {
           {
             required: true
           }
+        ],
+        desc: [
+          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
         ]
       },
 
@@ -677,7 +687,11 @@ export default {
             message: "不能为空",
             trigger: "blur"
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
+          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
+        ],
+        desc: [
+          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
         ]
       }
     };
@@ -750,6 +764,7 @@ export default {
       this.formValidate2.bodyVal = JSON.parse(res.api_body_desc);
 
       this.formValidate3.headerVal = JSON.parse(res.api_req_header_desc);
+      console.info(res.api_content_desc);
       this.formValidate3.respondVal = JSON.parse(res.api_content_desc);
       this.formValidate3.headerJson = res.api_req_header;
       this.formValidate3.respondJson = res.api_content;
@@ -940,8 +955,8 @@ export default {
           let _data = {
             name: this.formReModal.name,
             type: this.formReModal.type,
-            value: this.formReModal.value,
-            desc: this.formReModal.desc
+            value: replaceFun(this.formReModal.value),
+            desc: replaceFun(this.formReModal.desc)
           };
           if (this.reModalNext) {
             switch (this.reModalType) {
@@ -1029,7 +1044,7 @@ export default {
             name: this.formInModal.name,
             type: this.formInModal.type,
             must: this.formInModal.must,
-            desc: this.formInModal.desc
+            desc: replaceFun(this.formInModal.desc)
           };
           if (this.inModalNext) {
             switch (this.inModalType) {
