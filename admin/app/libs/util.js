@@ -34,6 +34,17 @@ const createMkdir = (str) => {
     })
 }
 
+/** 
+ * 批量替换单引号 
+ * @param str   
+ **/
+const replaceSingleQuotes = (str) => {
+    if(!str) return str
+    str = str.toString()
+    return str.replace(/\'/g, "\\'");
+};
+
 module.exports = {
-    createMkdir
+    createMkdir,
+    replaceSingleQuotes
 }

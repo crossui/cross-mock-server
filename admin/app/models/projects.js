@@ -1,8 +1,10 @@
 const allSqlAction = require("../libs/mysql")
 const Uuid = require('uuid');
+const { replaceSingleQuotes } = require('../libs/util');
 
 //检测是否存在
 async function check({ projectname }) {
+    projectname = replaceSingleQuotes(projectname)
     let sql = `select * from cross_project where projectname = '${projectname}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
@@ -15,6 +17,7 @@ async function check({ projectname }) {
 
 //创建
 async function create({ projectname, createtime }) {
+    projectname = replaceSingleQuotes(projectname)
     let pid = Uuid.v1();
     let reg = new RegExp('-', "g");
     pid = pid.replace(reg, '');
@@ -66,6 +69,7 @@ async function find({starLimit = 0 ,endLimit = 10} = {}) {
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
+    obj.projectname = replaceSingleQuotes(obj.projectname)
     let sql = `UPDATE cross_project SET projectname = '${obj.projectname}' WHERE pid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {

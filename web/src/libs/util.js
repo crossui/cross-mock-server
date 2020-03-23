@@ -237,19 +237,16 @@ util.pager = function (vm, pagination, page) {
     return pager;
 };
 
-/** 
- * 批量替换单引号 
- * @param str   
- **/
-util.replaceSingleQuotes = function (str) {
-    return str.replace(/\'/g, "’");
-};
 
 /** 
- * 批量替换双引号 
+ * 批量替换双引号为单引号
  * @param str   
  **/
-util.replaceDoubleQuotes = function (str) {
-    return str.replace(/\"/g, "”");
+util.replaceQuotes = function (str) {
+    if(!str) return str
+    str = str.toString()
+    str = str.replace(/\"/g, "'");
+    str = str.replace(/\s+/g,"");
+    return str.replace(/\r\n/g, "");
 };
 export default util;

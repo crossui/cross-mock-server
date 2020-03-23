@@ -494,12 +494,31 @@ const convertToTreeData = (data, pid) => {
 
   return result;
 };
-
-const replaceFun = val => {
-  let _val = val.replace(/\'/g, "");
-  _val = _val.replace(/\"/g, "");
-  return _val;
+const switchTypeFun = type => {
+  let _type = "";
+  switch (type) {
+    case "GET":
+      _type = "0";
+      break;
+    case "PUT":
+      _type = "1";
+      break;
+    case "POST":
+      _type = "2";
+      break;
+    case "DELETE":
+      _type = "3";
+      break;
+    case "OPTIONS":
+      _type = "4";
+      break;
+    case "PATCH":
+      _type = "5";
+      break;
+  }
+  return _type;
 };
+
 export default {
   data() {
     return {
@@ -714,7 +733,6 @@ export default {
     }
   },
   mounted() {
-    /* console.info(this.$) */
     this.init();
   },
   methods: {
@@ -762,9 +780,8 @@ export default {
       this.formValidate2.headerVal = JSON.parse(res.api_header_desc);
       this.formValidate2.getVal = JSON.parse(res.api_parms_desc);
       this.formValidate2.bodyVal = JSON.parse(res.api_body_desc);
-
+      
       this.formValidate3.headerVal = JSON.parse(res.api_req_header_desc);
-      console.info(res.api_content_desc);
       this.formValidate3.respondVal = JSON.parse(res.api_content_desc);
       this.formValidate3.headerJson = res.api_req_header;
       this.formValidate3.respondJson = res.api_content;
@@ -955,8 +972,8 @@ export default {
           let _data = {
             name: this.formReModal.name,
             type: this.formReModal.type,
-            value: replaceFun(this.formReModal.value),
-            desc: replaceFun(this.formReModal.desc)
+            value: Util.replaceQuotes(this.formReModal.value),
+            desc: Util.replaceQuotes(this.formReModal.desc)
           };
           if (this.reModalNext) {
             switch (this.reModalType) {
@@ -1044,7 +1061,7 @@ export default {
             name: this.formInModal.name,
             type: this.formInModal.type,
             must: this.formInModal.must,
-            desc: replaceFun(this.formInModal.desc)
+            desc: Util.replaceQuotes(this.formInModal.desc)
           };
           if (this.inModalNext) {
             switch (this.inModalType) {
@@ -1216,17 +1233,18 @@ export default {
       try {
         /* 基本信息 */
         this.formValidate1.apiname = data[0][0]["接口名称"];
-        this.formValidate1.apitype = data[0][0]["请求类型"];
+        this.formValidate1.apitype = switchTypeFun(data[0][0]["请求类型"]);
         this.formValidate1.apiurl = data[0][0]["接口地址"];
         this.formValidate1.apidesc = data[0][0]["接口描述"];
         /* 响应参数说明 */
         this.formValidate3.respondVal = data[1].map(item => {
-          return {
+          let _data = {
             name: item["返回键"],
             type: item["类型"],
-            value: item["返回值"],
-            desc: item["说明"]
+            value: Util.replaceQuotes(item["返回值"]),
+            desc: Util.replaceQuotes(item["说明"])
           };
+          return _data
         });
         /* 响应数据 */
         this.formValidate3.respondJson = data[2][0]["响应数据"];
@@ -1243,8 +1261,8 @@ export default {
                 return {
                   name: item["返回键"],
                   type: item["类型"],
-                  value: item["返回值"],
-                  desc: item["说明"]
+                  value: Util.replaceQuotes(item["返回值"]),
+                  desc: Util.replaceQuotes(item["说明"])
                 };
               });
         /* 响应Header数据 */
@@ -1270,7 +1288,7 @@ export default {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: item["说明"]
+                  desc: Util.replaceQuotes(item["说明"])
                 };
               });
         /* Get参数说明 */
@@ -1282,7 +1300,7 @@ export default {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: item["说明"]
+                  desc: Util.replaceQuotes(item["说明"])
                 };
               });
         /* body参数说明 */
@@ -1294,7 +1312,7 @@ export default {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: item["说明"]
+                  desc: Util.replaceQuotes(item["说明"])
                 };
               });
       } catch (error) {

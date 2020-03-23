@@ -1,7 +1,9 @@
 const allSqlAction = require("../libs/mysql")
+const { replaceSingleQuotes } = require('../libs/util');
 
 //检测是否存在
 async function check({ modulename, projectid }) {
+    modulename = replaceSingleQuotes(modulename)
     let sql = `select * from cross_module where modulename = '${modulename}' and projectid = '${projectid}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
@@ -14,6 +16,7 @@ async function check({ modulename, projectid }) {
 
 //创建
 async function create({ modulename, createtime, projectid, pmid }) {
+    modulename = replaceSingleQuotes(modulename)
     let sql = `insert into cross_module (modulename,projectid,createtime,pmid) values ('${modulename}','${projectid}','${createtime}','${pmid}')`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
@@ -50,6 +53,7 @@ async function findByPidAll(id) {
 
 //查找数据
 async function find({modulename = '', projectid = '', starLimit = 0 ,endLimit = 10} = {}) {
+    modulename = replaceSingleQuotes(modulename)
     let sql = `
         select sql_calc_found_rows * from cross_module
         where modulename like '%${modulename}%'
@@ -64,6 +68,7 @@ async function find({modulename = '', projectid = '', starLimit = 0 ,endLimit = 
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
+    obj.modulename = replaceSingleQuotes(obj.modulename)
     let sql = `UPDATE cross_module SET modulename = '${obj.modulename}', pmid = '${obj.pmid}' WHERE mid = '${id}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {

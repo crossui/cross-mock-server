@@ -1,7 +1,11 @@
 const allSqlAction = require("../libs/mysql")
+const { replaceSingleQuotes } = require('../libs/util');
 
 //检测是否存在
 async function check({ apiname, apiurl, projectid, moduleid }) {
+    apiname = replaceSingleQuotes(apiname)
+    apiurl = replaceSingleQuotes(apiurl)
+
     let sql = `select * from cross_interface where (api_url = '${apiurl}' or api_name = '${apiname}') and projectid = '${projectid}' and moduleid = '${moduleid}'`
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.length) {
@@ -13,6 +17,21 @@ async function check({ apiname, apiurl, projectid, moduleid }) {
 }
 //创建
 async function create(obj) {
+    obj.apiname = replaceSingleQuotes(obj.apiname)
+    obj.apiurl = replaceSingleQuotes(obj.apiurl)
+    obj.apidesc = replaceSingleQuotes(obj.apidesc)
+
+
+    obj.apiheaderdesc = replaceSingleQuotes(obj.apiheaderdesc)
+    obj.apiparmsdesc = replaceSingleQuotes(obj.apiparmsdesc)
+    obj.apibodydesc = replaceSingleQuotes(obj.apibodydesc)
+
+    obj.apicontent = replaceSingleQuotes(obj.apicontent)
+    obj.apicontentdesc = replaceSingleQuotes(obj.apicontentdesc)
+    obj.apireqheader = replaceSingleQuotes(obj.apireqheader)
+    obj.apireqheaderdesc = replaceSingleQuotes(obj.apireqheaderdesc)
+
+
     let sql = `insert into cross_interface 
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
@@ -37,12 +56,27 @@ async function create(obj) {
 async function batchcreate(obj) {
     let valuesText = '';
     obj.forEach(item => {
+
+        item.apiname = replaceSingleQuotes(item.apiname)
+        item.apiurl = replaceSingleQuotes(item.apiurl)
+        item.apidesc = replaceSingleQuotes(item.apidesc)
+
+
+        item.apiheaderdesc = replaceSingleQuotes(item.apiheaderdesc)
+        item.apiparmsdesc = replaceSingleQuotes(item.apiparmsdesc)
+        item.apibodydesc = replaceSingleQuotes(item.apibodydesc)
+
+        item.apicontent = replaceSingleQuotes(item.apicontent)
+        item.apicontentdesc = replaceSingleQuotes(item.apicontentdesc)
+        item.apireqheader = replaceSingleQuotes(item.apireqheader)
+        item.apireqheaderdesc = replaceSingleQuotes(item.apireqheaderdesc)
+
         valuesText += `('${item.projectid}','${item.moduleid}','${item.apiname}','${item.apiurl}'
         ,'${item.apicontent}','${item.apicontentdesc}','${item.apiheaderdesc}','${item.apiparmsdesc}'
         ,'${item.apibodydesc}','${item.apitype}','${item.ismockjs}','${item.apilazytime}'
         ,'${item.apidesc}','${item.createtime}','${item.apireqheader}','${item.apireqheaderdesc}','${item.apistatus}'),`
     })
-    valuesText = valuesText.substr(0,valuesText.length-1);
+    valuesText = valuesText.substr(0, valuesText.length - 1);
     let sql = `insert into cross_interface 
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
@@ -89,6 +123,7 @@ async function findByPid(id) {
 
 //查找数据
 async function find({ searchval = '', projectid = '', moduleid = '', starLimit = 0, endLimit = 10 } = {}) {
+    searchval = replaceSingleQuotes(searchval)
     let sql = `select sql_calc_found_rows a.projectname,b.modulename,
     c.mockid,c.api_name,c.api_url,c.api_type,c.api_status
     from cross_project a,cross_module b,cross_interface c 
@@ -105,6 +140,23 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
+
+    
+    obj.apiname = replaceSingleQuotes(obj.apiname)
+    obj.apiurl = replaceSingleQuotes(obj.apiurl)
+    obj.apidesc = replaceSingleQuotes(obj.apidesc)
+
+
+    obj.apiheaderdesc = replaceSingleQuotes(obj.apiheaderdesc)
+    obj.apiparmsdesc = replaceSingleQuotes(obj.apiparmsdesc)
+    obj.apibodydesc = replaceSingleQuotes(obj.apibodydesc)
+
+    obj.apicontent = replaceSingleQuotes(obj.apicontent)
+    obj.apicontentdesc = replaceSingleQuotes(obj.apicontentdesc)
+    obj.apireqheader = replaceSingleQuotes(obj.apireqheader)
+    obj.apireqheaderdesc = replaceSingleQuotes(obj.apireqheaderdesc)
+
+    
     let sql = `UPDATE cross_interface SET
     projectid = '${obj.projectid}',
     moduleid = '${obj.moduleid}',
