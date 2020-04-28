@@ -111,7 +111,10 @@ export default {
       axios({
         method: this.apiType,
         url: `${this.apiPrefix}${this.apiUrl}`,
-        timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000
+        timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000,
+        headers:{
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+        }
       })
         .then(res => {
           this.jsonHeaders = res.headers;

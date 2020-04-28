@@ -12,7 +12,7 @@ class InterfaceCtl {
   async find(ctx) {
     const { page, pagesize, searchval, projectid, moduleid } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
-    const endLimit = starLimit + parseInt(pagesize);
+    const endLimit = parseInt(pagesize);
     const res = await DB.find({ searchval, projectid, moduleid, starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };

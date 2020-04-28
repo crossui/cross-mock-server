@@ -11,7 +11,7 @@ class ModuleCtl {
   async find(ctx) {
     const { page, pagesize, modulename, projectid } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
-    const endLimit = starLimit + parseInt(pagesize);
+    const endLimit = parseInt(pagesize);
     const res = await DB.find({ modulename, projectid, starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };

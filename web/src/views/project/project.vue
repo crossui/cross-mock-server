@@ -50,6 +50,7 @@
               :dataSource="tabledata"
               :pagination="pagination"
               :loading="loading"
+              :expandedRowKeys="expandedRowKeys"
               @change="handleTableChange"
               bordered
             >
@@ -200,6 +201,7 @@ export default {
       },
       splitVal: 0.3,
       tabledata: [],
+      expandedRowKeys: [],
       pagination: { showQuickJumper: true },
       loading: false,
       columns: [
@@ -346,6 +348,13 @@ export default {
       }).then(res => {
         this.pmidOptions = convertSelectData(res.data.rows);
         this.tabledata = convertToTreeData(res.data.rows, 0);
+        this.expandedRowKeys = this.tabledata.map(item=>{
+          if(item.children){
+            return item.mid
+          }
+        }).filter(item=>{
+          return item != undefined
+        })
         this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
@@ -354,7 +363,7 @@ export default {
       });
     },
     //表格分页
-    handleTableChange(p) {
+    handleTableChange(p,t,r) {
       this.fetch(p.current);
     },
     //新增模块

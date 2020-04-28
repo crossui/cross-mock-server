@@ -5,7 +5,7 @@ const database = {
     password: 'root123', //mysql密码
     PORT: '3306', //mysql端口号
     prefix: 'cross_', //表前缀
-    host: "10.16.0.78" //服务器ip
+    host: "127.0.0.1" //服务器ip
 };
 
 const serviceport = "8033";

@@ -12,7 +12,7 @@ class ProjectCtl {
   async find(ctx) {
     const { page, pagesize } = ctx.query;
     const starLimit = (parseInt(page) - 1) * parseInt(pagesize);
-    const endLimit = starLimit + parseInt(pagesize);
+    const endLimit = parseInt(pagesize);
     const res = await DB.find({ starLimit, endLimit })
     ctx.body = { message: "ok", data: res, code: 200 }
   };
