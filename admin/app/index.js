@@ -24,6 +24,7 @@ app.use(error({
 app.use(koaBody({
     multipart: true, //支持上传文件
     formidable: { //node包
+        maxFieldsSize: 5 * 1024 * 1024,
         uploadDir: path.join(__dirname, '/public/uploads'), //上传目录
         keepExtensions: true, // 保留扩展名
     },

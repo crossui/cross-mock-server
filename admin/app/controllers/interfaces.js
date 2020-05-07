@@ -37,14 +37,18 @@ class InterfaceCtl {
       apireqheaderdesc: { type: 'string', required: false },
       createtime: { type: 'string', required: false },
       //rcode: { type: 'string', required: true },
+      sqlsentence: { type: 'string', required: false },
       apistatus: { type: 'string', required: true }
     });
-    const { apiname, apiurl, projectid, moduleid } = ctx.request.body;
+    const { apiname, apiurl, projectid, moduleid, fileList } = ctx.request.body;
+    console.info(fileList)
+
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
     if (repeated) {
       ctx.body = { message: "同一项目且同一模块下不可以有一样的接口名称或地址", code: 409 }
     } else {
       let res = await DB.create(ctx.request.body)
+
       ctx.body = res ? { message: "提交成功", data: res, code: 200 } : { message: "提交失败", code: 201 }
     }
   };
@@ -72,7 +76,6 @@ class InterfaceCtl {
     /* 是否已经被注册过 */
     const { apiname, apiurl, projectid, moduleid } = ctx.request.body;
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
-
     if (repeated) {
       let createed = false;
       repeated.forEach(item => {

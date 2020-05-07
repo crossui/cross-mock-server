@@ -1,6 +1,8 @@
 const allSqlAction = require("../libs/mysql")
 const { replaceSingleQuotes } = require('../libs/util');
-
+const uploadFileDB = require('./uploadFile');
+const IP = require('ip');
+const { serviceport } = require('../config'); //配置信息
 //检测是否存在
 async function check({ apiname, apiurl, projectid, moduleid }) {
     apiname = replaceSingleQuotes(apiname)
@@ -30,18 +32,19 @@ async function create(obj) {
     obj.apicontentdesc = replaceSingleQuotes(obj.apicontentdesc)
     obj.apireqheader = replaceSingleQuotes(obj.apireqheader)
     obj.apireqheaderdesc = replaceSingleQuotes(obj.apireqheaderdesc)
+    obj.sqlsentence = replaceSingleQuotes(obj.sqlsentence)
 
 
     let sql = `insert into cross_interface 
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status,sqlsentence) 
     values 
     ('${obj.projectid}','${obj.moduleid}','${obj.apiname}','${obj.apiurl}'
     ,'${obj.apicontent}','${obj.apicontentdesc}','${obj.apiheaderdesc}','${obj.apiparmsdesc}'
     ,'${obj.apibodydesc}','${obj.apitype}','${obj.ismockjs}','${obj.apilazytime}'
-    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}')`;
+    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}'),${obj.sqlsentence}`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return res
@@ -70,18 +73,19 @@ async function batchcreate(obj) {
         item.apicontentdesc = replaceSingleQuotes(item.apicontentdesc)
         item.apireqheader = replaceSingleQuotes(item.apireqheader)
         item.apireqheaderdesc = replaceSingleQuotes(item.apireqheaderdesc)
+        item.sqlsentence = replaceSingleQuotes(item.sqlsentence)
 
         valuesText += `('${item.projectid}','${item.moduleid}','${item.apiname}','${item.apiurl}'
         ,'${item.apicontent}','${item.apicontentdesc}','${item.apiheaderdesc}','${item.apiparmsdesc}'
         ,'${item.apibodydesc}','${item.apitype}','${item.ismockjs}','${item.apilazytime}'
-        ,'${item.apidesc}','${item.createtime}','${item.apireqheader}','${item.apireqheaderdesc}','${item.apistatus}'),`
+        ,'${item.apidesc}','${item.createtime}','${item.apireqheader}','${item.apireqheaderdesc}','${item.apistatus}','${item.sqlsentence}'),`
     })
     valuesText = valuesText.substr(0, valuesText.length - 1);
     let sql = `insert into cross_interface 
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status,sqlsentence) 
     values ${valuesText}`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows >= 1) {
@@ -95,8 +99,21 @@ async function batchcreate(obj) {
 //查找指定数据
 async function findByMockid(id) {
     let sql = `select * from cross_interface where mockid = '${id}'`
-    return allSqlAction.allSqlAction(sql).then(res => {
+    return allSqlAction.allSqlAction(sql).then(async res => {
         if (res.length) {
+            let fileRes = await uploadFileDB.findInvolv({ id })
+            if (fileRes.length) {
+                res[0].fileList = fileRes.map(item => {
+                    return {
+                        uid: item.fileId,
+                        fileid: item.fileId,
+                        name: item.fileName,
+                        status: "done",
+                        url: `http://${IP.address()}:${serviceport}/uploads/${item.fileName}`,
+                        thumbUrl: `http://${IP.address()}:${serviceport}/uploads/${item.fileName}`
+                    }
+                })
+            }
             return res
         } else {
             return []
@@ -135,13 +152,14 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
     limit ${starLimit}, ${endLimit}`
     let result = await allSqlAction.allSqlAction(sql)
     let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
-    return { rows: result, totals: count[0].total }
+    //return { rows: result, totals: count[0].total }
+    return { rows: result, totals: 5000 }
 }
 
 //更新数据
 async function findByIdAndUpdate(id, obj) {
 
-    
+
     obj.apiname = replaceSingleQuotes(obj.apiname)
     obj.apiurl = replaceSingleQuotes(obj.apiurl)
     obj.apidesc = replaceSingleQuotes(obj.apidesc)
@@ -155,8 +173,9 @@ async function findByIdAndUpdate(id, obj) {
     obj.apicontentdesc = replaceSingleQuotes(obj.apicontentdesc)
     obj.apireqheader = replaceSingleQuotes(obj.apireqheader)
     obj.apireqheaderdesc = replaceSingleQuotes(obj.apireqheaderdesc)
+    obj.sqlsentence = replaceSingleQuotes(obj.sqlsentence)
 
-    
+
     let sql = `UPDATE cross_interface SET
     projectid = '${obj.projectid}',
     moduleid = '${obj.moduleid}',
@@ -174,11 +193,16 @@ async function findByIdAndUpdate(id, obj) {
     api_req_header = '${obj.apireqheader}',
     api_req_header_desc = '${obj.apireqheaderdesc}',
     api_status = '${obj.apistatus}',
-    rcode = '${obj.rcode}'
+    rcode = '${obj.rcode}',
+    sqlsentence = '${obj.sqlsentence}'
     WHERE mockid = '${id}'`;
-
+    let fileList = obj.fileList
+    console.info(fileList)
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
+            fileList.forEach(async item => {
+                let res = await uploadFileDB.findByIdAndUpdate(item.fileid, { idRelation: id })
+            })
             return true
         } else {
             return false

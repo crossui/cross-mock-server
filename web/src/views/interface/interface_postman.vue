@@ -14,6 +14,33 @@
         </v-input-group>
       </v-card>
       <div class="margin-top-20">
+        <v-row :gutter="16">
+          <v-col :span="12">
+            <v-card title="图片">
+              <v-scrollbar class="scroll-help">
+                <v-upload
+                  action
+                  class="mock-view-picture"
+                  list-type="picture-card"
+                  :file-list="fileList"
+                  @preview="handlePreview"
+                ></v-upload>
+                <v-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+                  <img alt="example" style="width: 100%" :src="previewImage" />
+                </v-modal>
+              </v-scrollbar>
+            </v-card>
+          </v-col>
+          <v-col :span="12">
+            <v-card title="语句">
+              <v-scrollbar class="scroll-help">
+                <div class="mock-sqlsentence">{{sqlsentence}}</div>
+              </v-scrollbar>
+            </v-card>
+          </v-col>
+        </v-row>
+      </div>
+      <div class="margin-top-20">
         <v-card title="响应数据" :bodyStyle="{padding: '0px'}">
           <div class="split-wrap">
             <v-split v-model="splitVal">
@@ -72,6 +99,10 @@ export default {
   },
   data() {
     return {
+      previewVisible: false,
+      previewImage: "",
+      fileList: [],
+      sqlsentence: "",
       spinning: false,
       splitVal: 0.3,
       apiType: "",
@@ -95,6 +126,8 @@ export default {
       this.apiPrefix = `http://${ip}/mock/${result.projectid}/`;
       this.apiUrl = result.api_url;
       this.apilazytime = result.api_lazy_time;
+      this.sqlsentence = result.sqlsentence;
+      this.fileList = result.fileList;
       this.spinning = false;
     },
     async getApiInfo() {
@@ -112,7 +145,7 @@ export default {
         method: this.apiType,
         url: `${this.apiPrefix}${this.apiUrl}`,
         timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000,
-        headers:{
+        headers: {
           "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
         }
       })
@@ -143,18 +176,34 @@ export default {
         .catch(err => {
           this.spinning = false;
         }); */
+    },
+    handlePreview(file) {
+      this.previewImage = file.url || file.thumbUrl;
+      this.previewVisible = true;
+    },
+    handleCancel() {
+      this.previewVisible = false;
     }
   }
 };
 </script>
-<style lang="less" scoped>
+<style lang="less">
+.mock-sqlsentence {
+  word-wrap: break-word;
+}
+.mock-view-picture .vcuicon-delete {
+  display: none;
+}
 .split-wrap {
-  height: 680px;
+  height: 400px;
   .split-pane {
     padding: 0 20px;
   }
 }
+.scroll-help {
+  height: 105px;
+}
 .scroll-container {
-  height: 600px;
+  height: 400px;
 }
 </style>

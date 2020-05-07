@@ -146,6 +146,7 @@ const renderFileArr = (data, pid, mid) => {
       apitype: switchTypeFun(itemone["请求类型"]),
       apidesc: "",
       apistatus: "2",
+      sqlsentence: itemone["语句"],
       apiheaderdesc: "[]",
       apiparmsdesc: "[]",
       ismockjs: 0,

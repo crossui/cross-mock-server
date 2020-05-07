@@ -64,7 +64,8 @@ async function find({starLimit = 0 ,endLimit = 10} = {}) {
     `
     let result = await allSqlAction.allSqlAction(sql)
     let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
-    return {rows: result, totals: count[0].total}
+    //return {rows: result, totals: count[0].total}
+	return {rows: result, totals: 5000}
 }
 
 //更新数据

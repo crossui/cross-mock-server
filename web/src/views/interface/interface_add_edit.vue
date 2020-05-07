@@ -73,6 +73,29 @@
             <v-form-item label="接口描述" prop="apidesc">
               <v-textarea :rows="4" v-model="formValidate1.apidesc" placeholder="请输入接口描述" />
             </v-form-item>
+            <v-form-item label="语句" prop="sqlsentence">
+              <v-textarea :rows="4" v-model="formValidate1.sqlsentence" placeholder="请输入SQL语句" />
+            </v-form-item>
+            <v-form-item label="图片">
+              <v-upload
+                name="interface"
+                listType="picture-card"
+                :fileList="fileList"
+                action="//localhost:8033/uploadFile/interface"
+                :beforeUpload="beforeUpload"
+                @preview="handlePreview"
+                @remove="handleRemoveUpload"
+                @change="handleChangeUpload"
+              >
+                <div>
+                  <v-icon type="plus"></v-icon>
+                  <div class="vcu-upload-text">Upload</div>
+                </div>
+              </v-upload>
+              <v-modal :visible="previewVisible" :footer="null" @cancel="handleCancelPreview">
+                <img alt="example" style="width: 100%" :src="previewImage" />
+              </v-modal>
+            </v-form-item>
             <v-form-item label>
               <v-button type="primary" @click="handleNextTabs('2')">下一步</v-button>
             </v-form-item>
@@ -317,7 +340,6 @@
           </v-form-item>
         </v-form>
       </v-modal>
-      
     </div>
     <iframe name="myIframe" style="display:none"></iframe>
     <input type="file" id="file" style="display:none" @change="importFile" />
@@ -519,9 +541,17 @@ const switchTypeFun = type => {
   return _type;
 };
 
+const getBase64 = (img, callback) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
 export default {
   data() {
     return {
+      previewVisible: false,
+      previewImage: "",
+      fileList: [],
       spinning: false,
       selectTab: "1",
       mockId: null,
@@ -532,7 +562,8 @@ export default {
         apiname: "",
         apiurl: "",
         apidesc: "",
-        apistatus: "2"
+        apistatus: "2",
+        sqlsentence: ""
       },
       ruleValidate1: {
         projectid: [
@@ -667,9 +698,7 @@ export default {
             required: true
           }
         ],
-        desc: [
-          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
-        ]
+        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }]
       },
 
       reModalType: "",
@@ -709,9 +738,7 @@ export default {
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
           { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
         ],
-        desc: [
-          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
-        ]
+        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }]
       }
     };
   },
@@ -775,12 +802,14 @@ export default {
       this.formValidate1.apiname = res.api_name;
       this.formValidate1.apiurl = res.api_url;
       this.formValidate1.apidesc = res.api_desc;
+      this.formValidate1.sqlsentence = res.sqlsentence;
       this.formValidate1.apistatus = res.api_status;
+      this.fileList = res.fileList;
 
       this.formValidate2.headerVal = JSON.parse(res.api_header_desc);
       this.formValidate2.getVal = JSON.parse(res.api_parms_desc);
       this.formValidate2.bodyVal = JSON.parse(res.api_body_desc);
-      
+
       this.formValidate3.headerVal = JSON.parse(res.api_req_header_desc);
       this.formValidate3.respondVal = JSON.parse(res.api_content_desc);
       this.formValidate3.headerJson = res.api_req_header;
@@ -1155,6 +1184,15 @@ export default {
       }
     },
     saveResult() {
+      const fileList = this.fileList
+        .map(item => {
+          if (item.status == "done") {
+            return item.response;
+          }
+        })
+        .filter(item => {
+          return item != undefined;
+        });
       let data = {
         projectid: this.formValidate1.projectid,
         moduleid: parseInt(this.formValidate1.moduleid.value),
@@ -1162,6 +1200,7 @@ export default {
         apiurl: this.formValidate1.apiurl,
         apitype: this.formValidate1.apitype,
         apidesc: this.formValidate1.apidesc,
+        sqlsentence: this.formValidate1.sqlsentence,
         apistatus: this.formValidate1.apistatus,
 
         apiheaderdesc: JSON.stringify(this.formValidate2.headerVal),
@@ -1174,7 +1213,8 @@ export default {
         apireqheader: JSON.stringify(this.formValidate3.headerJson),
         apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
         //rcode: this.formValidate3.rcode,
-        apilazytime: this.formValidate3.lazytime
+        apilazytime: this.formValidate3.lazytime,
+        fileList
       };
       let method = "POST";
       let url = `/interfaces`;
@@ -1236,6 +1276,7 @@ export default {
         this.formValidate1.apitype = switchTypeFun(data[0][0]["请求类型"]);
         this.formValidate1.apiurl = data[0][0]["接口地址"];
         this.formValidate1.apidesc = data[0][0]["接口描述"];
+        this.formValidate1.sqlsentence = data[0][0]["语句"];
         /* 响应参数说明 */
         this.formValidate3.respondVal = data[1].map(item => {
           let _data = {
@@ -1244,7 +1285,7 @@ export default {
             value: Util.replaceQuotes(item["返回值"]),
             desc: Util.replaceQuotes(item["说明"])
           };
-          return _data
+          return _data;
         });
         /* 响应数据 */
         this.formValidate3.respondJson = data[2][0]["响应数据"];
@@ -1318,6 +1359,44 @@ export default {
       } catch (error) {
         alert(error);
       }
+    },
+    handleCancelPreview() {
+      this.previewVisible = false;
+    },
+    //删除图片
+    handleRemoveUpload(file) {
+      this.$request({
+        method: "POST",
+        url: "/uploadFile/delete",
+        data: {
+          id: file.fileid
+        }
+      }).then(res => {
+        if (res) {
+          this.$message.success(res.message);
+        }
+      });
+    },
+    //查看图片
+    handlePreview(file) {
+      this.previewImage = file.url || file.thumbUrl;
+      this.previewVisible = true;
+    },
+    //上传图片
+    handleChangeUpload({ fileList }) {
+      this.fileList = fileList;
+    },
+    //上传图片前
+    beforeUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      if (!isJPG) {
+        this.$message.error("You can only upload JPG file!");
+      }
+      const isLt2M = file.size / 1024 / 1024 < 4;
+      if (!isLt2M) {
+        this.$message.error("Image must smaller than 4MB!");
+      }
+      return isJPG && isLt2M;
     }
   }
 };
@@ -1346,5 +1425,15 @@ export default {
       }
     }
   }
+}
+
+.vcu-upload-select-picture-card i {
+  font-size: 32px;
+  color: #999;
+}
+
+.vcu-upload-select-picture-card .vcu-upload-text {
+  margin-top: 8px;
+  color: #666;
 }
 </style>

@@ -63,7 +63,8 @@ async function find({modulename = '', projectid = '', starLimit = 0 ,endLimit = 
     `
     let result = await allSqlAction.allSqlAction(sql)
     let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
-    return {rows: result, totals: count[0].total}
+    //return {rows: result, totals: count[0].total}
+	return {rows: result, totals: 5000}
 }
 
 //更新数据

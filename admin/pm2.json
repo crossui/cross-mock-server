@@ -8,7 +8,7 @@
       "error_file": "./logs/app-err.log",
       "out_file": "./logs/app-out.log",
       "instances": 0,
-      "max_memory_restart": "2G",
+      "max_memory_restart": "12G",
       "autorestart": true,
       "node_args": [],
       "args": [],
