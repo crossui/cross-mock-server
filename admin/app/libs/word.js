@@ -207,6 +207,13 @@ async function generate(result) {
             let httptypeObj = myDoc.createP()
             httptypeObj.addText(`${protIndex}.${++i} HTTP请求方式：`, { font_size: 14 });
             httptypeObj.addText(`${apiTypeFun(item.api_type)}`, { font_size: 12 });
+
+            //语句
+            let sqlsentenceTitleObj = myDoc.createP()
+            sqlsentenceTitleObj.addText(`${protIndex}.${++i} SQL语句：`, { font_size: 14 });
+            let sqlsentenceObj = myDoc.createP()
+            sqlsentenceObj.addText(`${item.sqlsentence}`, { font_size: 12 });
+
             //请求Header参数说明
             if (item.api_header_desc !== "[]") {
                 let inHeaderDescObj = myDoc.createP()
@@ -246,13 +253,13 @@ async function generate(result) {
 
             myDoc.createP({ align: 'center' })
         })
-        let out,nowtime;
+        let out, nowtime;
         //判断目录是否存在
         if (createMkdir('./app/public/exports')) {
             // 创建文件
             nowtime = (new Date()).getTime();
             out = fs.createWriteStream(`./app/public/exports/${nowtime}.docx`);
-        }else{
+        } else {
             reject()
         }
 

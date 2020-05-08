@@ -141,7 +141,7 @@ async function findByPid(id) {
 //查找数据
 async function find({ searchval = '', projectid = '', moduleid = '', starLimit = 0, endLimit = 10 } = {}) {
     searchval = replaceSingleQuotes(searchval)
-    let sql = `select sql_calc_found_rows a.projectname,b.modulename,
+    let sql = `select a.projectname,b.modulename,
     c.mockid,c.api_name,c.api_url,c.api_type,c.api_status
     from cross_project a,cross_module b,cross_interface c 
     where a.pid=c.projectid and b.mid=c.moduleid
@@ -150,10 +150,15 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
     and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
     order by mockid desc
     limit ${starLimit}, ${endLimit}`
+    let totalSql = `select count(*) 
+    from cross_project a,cross_module b,cross_interface c 
+    where a.pid=c.projectid and b.mid=c.moduleid
+    and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')
+    and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)
+    and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)`
     let result = await allSqlAction.allSqlAction(sql)
-    let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
-    //return { rows: result, totals: count[0].total }
-    return { rows: result, totals: 5000 }
+    let count = await allSqlAction.allSqlAction(totalSql)
+    return { rows: result, totals: count[0]["count(*)"] }
 }
 
 //更新数据

@@ -48,7 +48,8 @@
               :indentSize="30"
               :columns="columns"
               :dataSource="tabledata"
-              :pagination="pagination"
+              :scroll="{ y: 580 }"
+              :pagination="false"
               :loading="loading"
               :expandedRowKeys="expandedRowKeys"
               @change="handleTableChange"
@@ -202,7 +203,7 @@ export default {
       splitVal: 0.3,
       tabledata: [],
       expandedRowKeys: [],
-      pagination: { showQuickJumper: true },
+      //pagination: { showQuickJumper: true },
       loading: false,
       columns: [
         {
@@ -355,10 +356,10 @@ export default {
         }).filter(item=>{
           return item != undefined
         })
-        this.pagination = Util.pager(this, this.pagination, {
+        /* this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
-        });
+        }); */
         this.loading = false;
       });
     },

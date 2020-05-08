@@ -204,6 +204,6 @@ export default {
   height: 105px;
 }
 .scroll-container {
-  height: 400px;
+  height: 330px;
 }
 </style>

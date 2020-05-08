@@ -58,14 +58,14 @@ async function findAll(){
 //查找数据
 async function find({starLimit = 0 ,endLimit = 10} = {}) {
     let sql = `
-        select sql_calc_found_rows * from cross_project
+        select * from cross_project
         order by createtime desc
         limit ${starLimit}, ${endLimit};
     `
+    let totalSql = `select count(*) from cross_project`
     let result = await allSqlAction.allSqlAction(sql)
-    let count = await allSqlAction.allSqlAction(`SELECT FOUND_ROWS() as total;`)
-    //return {rows: result, totals: count[0].total}
-	return {rows: result, totals: 5000}
+    let count = await allSqlAction.allSqlAction(totalSql)
+	return {rows: result, totals: count[0]["count(*)"]}
 }
 
 //更新数据
