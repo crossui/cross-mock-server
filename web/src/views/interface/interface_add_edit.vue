@@ -81,7 +81,7 @@
                 name="interface"
                 listType="picture-card"
                 :fileList="fileList"
-                action="//localhost:8033/uploadFile/interface"
+                action="/uploadFile/interface"
                 :beforeUpload="beforeUpload"
                 @preview="handlePreview"
                 @remove="handleRemoveUpload"
@@ -804,7 +804,7 @@ export default {
       this.formValidate1.apidesc = res.api_desc;
       this.formValidate1.sqlsentence = res.sqlsentence;
       this.formValidate1.apistatus = res.api_status;
-      this.fileList = res.fileList;
+      this.fileList = res.fileList ? res.fileList : [];
 
       this.formValidate2.headerVal = JSON.parse(res.api_header_desc);
       this.formValidate2.getVal = JSON.parse(res.api_parms_desc);
@@ -1388,15 +1388,16 @@ export default {
     },
     //上传图片前
     beforeUpload(file) {
-      const isJPG = file.type === "image/jpeg";
+      /* const isJPG = file.type === "image/jpeg";
       if (!isJPG) {
         this.$message.error("You can only upload JPG file!");
-      }
+      } */
       const isLt2M = file.size / 1024 / 1024 < 4;
       if (!isLt2M) {
         this.$message.error("Image must smaller than 4MB!");
       }
-      return isJPG && isLt2M;
+      //return isJPG && isLt2M;
+      return isLt2M;
     }
   }
 };

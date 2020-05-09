@@ -48,7 +48,7 @@
               :indentSize="30"
               :columns="columns"
               :dataSource="tabledata"
-              :scroll="{ y: 580 }"
+              :scroll="{ y: 500 }"
               :pagination="false"
               :loading="loading"
               :expandedRowKeys="expandedRowKeys"
@@ -327,6 +327,7 @@ export default {
     },
     //选择项目
     handleSelectProj(record) {
+      this.searchModuleName = ""
       this.selectedProject = record.pid;
       this.fetch(1);
     },
@@ -347,15 +348,22 @@ export default {
           pagesize: 10
         }
       }).then(res => {
-        this.pmidOptions = convertSelectData(res.data.rows);
-        this.tabledata = convertToTreeData(res.data.rows, 0);
-        this.expandedRowKeys = this.tabledata.map(item=>{
-          if(item.children){
-            return item.mid
-          }
-        }).filter(item=>{
-          return item != undefined
-        })
+        if (this.searchModuleName == "") {
+          this.pmidOptions = convertSelectData(res.data.rows);
+          this.tabledata = convertToTreeData(res.data.rows, 0);
+          this.expandedRowKeys = this.tabledata
+            .map(item => {
+              if (item.children) {
+                return item.mid;
+              }
+            })
+            .filter(item => {
+              return item != undefined;
+            });
+        }else{
+          this.tabledata = res.data.rows
+        }
+
         /* this.pagination = Util.pager(this, this.pagination, {
           current: pageNum,
           total: res.data.totals
@@ -364,7 +372,7 @@ export default {
       });
     },
     //表格分页
-    handleTableChange(p,t,r) {
+    handleTableChange(p, t, r) {
       this.fetch(p.current);
     },
     //新增模块
@@ -438,7 +446,7 @@ export default {
     handleAddChildModule(record) {
       this.modModalType = true;
       this.modleVisible = true;
-      this.formModle.pmid = record.mid.toString()
+      this.formModle.pmid = record.mid.toString();
     },
     //删除模块
     handleDeleteModule(record) {
