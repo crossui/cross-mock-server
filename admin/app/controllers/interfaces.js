@@ -37,7 +37,6 @@ class InterfaceCtl {
       apireqheaderdesc: { type: 'string', required: false },
       createtime: { type: 'string', required: false },
       //rcode: { type: 'string', required: true },
-      sqlsentence: { type: 'string', required: false },
       apistatus: { type: 'string', required: true }
     });
     const { apiname, apiurl, projectid, moduleid, fileList } = ctx.request.body;

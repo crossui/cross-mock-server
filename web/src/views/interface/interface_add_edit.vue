@@ -681,10 +681,6 @@ export default {
             required: true,
             message: "不能为空",
             trigger: "blur"
-          },
-          {
-            pattern: /^[A-Za-z0-9]+$/,
-            message: "只允许英文、数字"
           }
         ],
         type: [
@@ -717,10 +713,6 @@ export default {
             required: true,
             message: "不能为空",
             trigger: "blur"
-          },
-          {
-            pattern: /^[A-Za-z0-9]+$/,
-            message: "只允许英文、数字"
           }
         ],
         type: [

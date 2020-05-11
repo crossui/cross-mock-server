@@ -39,12 +39,12 @@ async function create(obj) {
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status,sqlsentence) 
+        sql_sentence,api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
     values 
     ('${obj.projectid}','${obj.moduleid}','${obj.apiname}','${obj.apiurl}'
     ,'${obj.apicontent}','${obj.apicontentdesc}','${obj.apiheaderdesc}','${obj.apiparmsdesc}'
     ,'${obj.apibodydesc}','${obj.apitype}','${obj.ismockjs}','${obj.apilazytime}'
-    ,'${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}'),${obj.sqlsentence}`;
+    ,'${obj.sqlsentence}','${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}')`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return res
@@ -85,7 +85,7 @@ async function batchcreate(obj) {
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        api_desc,createtime,api_req_header,api_req_header_desc,api_status,sqlsentence) 
+        api_desc,createtime,api_req_header,api_req_header_desc,api_status,sql_sentence) 
     values ${valuesText}`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows >= 1) {
@@ -199,7 +199,7 @@ async function findByIdAndUpdate(id, obj) {
     api_req_header_desc = '${obj.apireqheaderdesc}',
     api_status = '${obj.apistatus}',
     rcode = '${obj.rcode}',
-    sqlsentence = '${obj.sqlsentence}'
+    sql_sentence = '${obj.sqlsentence}'
     WHERE mockid = '${id}'`;
     let fileList = obj.fileList
     console.info(fileList)
