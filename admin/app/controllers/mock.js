@@ -35,10 +35,12 @@ class MockCtl {
           let headerObj = JSON.parse(rows[0].api_req_header)
           let headers = Object.keys(headerObj)
           if (headers.length !== 0) {
-            ctx.set("Access-Control-Expose-Headers", "*");
+            let keyList = []
             headers.forEach((key) => {
+              keyList.push(key)
               ctx.append(key, headerObj[key]);
             });
+            ctx.set("Access-Control-Expose-Headers", keyList);
           }
           //延迟返回数据
           if (rows[0].api_lazy_time > 0) {
