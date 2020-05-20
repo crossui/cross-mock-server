@@ -794,7 +794,7 @@ export default {
       this.formValidate1.apiname = res.api_name;
       this.formValidate1.apiurl = res.api_url;
       this.formValidate1.apidesc = res.api_desc;
-      this.formValidate1.sqlsentence = res.sqlsentence;
+      this.formValidate1.sqlsentence = res.sql_sentence;
       this.formValidate1.apistatus = res.api_status;
       this.fileList = res.fileList ? res.fileList : [];
 

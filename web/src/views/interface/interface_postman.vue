@@ -126,7 +126,7 @@ export default {
       this.apiPrefix = `http://${ip}/mock/${result.projectid}/`;
       this.apiUrl = result.api_url;
       this.apilazytime = result.api_lazy_time;
-      this.sqlsentence = result.sqlsentence;
+      this.sqlsentence = result.sql_sentence;
       this.fileList = result.fileList;
       this.spinning = false;
     },
