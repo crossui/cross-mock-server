@@ -40,6 +40,17 @@
                 v-model="formValidate1.moduleid"
               ></v-tree-select>
             </v-form-item>
+            <v-form-item label="关联模块" prop="relationModuleid">
+              <v-tree-select
+                style="width: 420px"
+                :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
+                :treeData="optionsModule"
+                treeDefaultExpandAll
+                labelInValue
+                tree-checkable
+                v-model="formValidate1.relationModuleid"
+              ></v-tree-select>
+            </v-form-item>
             <v-form-item label="请求类型" prop="apitype">
               <v-select
                 style="width: 420px"
@@ -558,6 +569,7 @@ export default {
       formValidate1: {
         projectid: "",
         moduleid: undefined,
+        relationModuleid: undefined,
         apitype: "",
         apiname: "",
         apiurl: "",
@@ -790,6 +802,7 @@ export default {
       this.mockId = res.mockid;
       this.formValidate1.projectid = res.projectid;
       this.formValidate1.moduleid = { value: res.moduleid.toString() };
+      this.formValidate1.relationModuleid = JSON.parse(res.relation_moduleid);
       this.formValidate1.apitype = res.api_type;
       this.formValidate1.apiname = res.api_name;
       this.formValidate1.apiurl = res.api_url;
@@ -1188,6 +1201,7 @@ export default {
       let data = {
         projectid: this.formValidate1.projectid,
         moduleid: parseInt(this.formValidate1.moduleid.value),
+        relationModuleid: JSON.stringify(this.formValidate1.relationModuleid),
         apiname: this.formValidate1.apiname,
         apiurl: this.formValidate1.apiurl,
         apitype: this.formValidate1.apitype,

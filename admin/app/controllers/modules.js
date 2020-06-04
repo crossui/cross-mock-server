@@ -1,5 +1,5 @@
 const DB = require('../models/modules');
-const interfaceDB = require('../models/interfaces');
+//const interfaceDB = require('../models/interfaces');
 
 class ModuleCtl {
   //查找某项目全部数据
@@ -66,7 +66,7 @@ class ModuleCtl {
   // 删除
   async delete(ctx) {
     const id = ctx.request.body.id
-    const interfaceRes = await interfaceDB.findByMidAndRemove(id)
+    //const interfaceRes = await interfaceDB.findByMidAndRemove(id)
     const res = await DB.findByIdAndRemove(id);
     if (!res) {
       ctx.body = { message: "删除失败", code: 201 };

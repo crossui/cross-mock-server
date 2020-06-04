@@ -104,8 +104,12 @@ export default {
           id: record.pid
         }
       }).then(res => {
-        this.fileUrl = res.data.fileUrl;
-        this.downloadFile()
+        if(res.code == 200){
+          this.fileUrl = res.data.fileUrl;
+          this.downloadFile()
+        }else{
+          this.$message.error(res.message)
+        }
         this.loading = false;
       }).catch(err =>{
         this.loading = false;

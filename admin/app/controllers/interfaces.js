@@ -1,4 +1,5 @@
 const DB = require('../models/interfaces');
+const relationModuleidDB = require('../models/relation_moduleid');
 const IP = require('ip');
 const { serviceport } = require('../config'); //配置信息
 
@@ -39,15 +40,24 @@ class InterfaceCtl {
       //rcode: { type: 'string', required: true },
       apistatus: { type: 'string', required: true }
     });
-    const { apiname, apiurl, projectid, moduleid, fileList } = ctx.request.body;
-    console.info(fileList)
+    const { apiname, apiurl, projectid, moduleid, fileList, relationModuleid } = ctx.request.body;
 
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
     if (repeated) {
       ctx.body = { message: "同一项目且同一模块下不可以有一样的接口名称或地址", code: 409 }
     } else {
       let res = await DB.create(ctx.request.body)
-
+      //关联项目ID
+      if (relationModuleid != "") {
+        let _relation = JSON.parse(relationModuleid);
+        _relation.forEach(async item => {
+          await relationModuleidDB.create({
+            mockid: res.insertId,
+            projectid:projectid,
+            ...item
+          })
+        })
+      }
       ctx.body = res ? { message: "提交成功", data: res, code: 200 } : { message: "提交失败", code: 201 }
     }
   };
@@ -73,7 +83,7 @@ class InterfaceCtl {
       apistatus: { type: 'string', required: true }
     });
     /* 是否已经被注册过 */
-    const { apiname, apiurl, projectid, moduleid } = ctx.request.body;
+    const { apiname, apiurl, projectid, moduleid,relationModuleid } = ctx.request.body;
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
     if (repeated) {
       let createed = false;
@@ -93,6 +103,19 @@ class InterfaceCtl {
     if (!res) {
       ctx.body = { message: "接口不存在", code: 204 };
     } else {
+      //更新关联模块ID
+      await relationModuleidDB.findByIdAndRemove(ctx.params.id)
+      if (relationModuleid != "") {
+        let _relation = JSON.parse(relationModuleid);
+        _relation.forEach(async item => {
+          await relationModuleidDB.create({
+            mockid: ctx.params.id,
+            projectid:projectid,
+            ...item
+          })
+        })
+      }
+
       ctx.body = { message: "修改成功", data: { insertId: ctx.params.id }, code: 200 };
 
     }
@@ -103,6 +126,8 @@ class InterfaceCtl {
     if (!res) {
       ctx.body = { message: "删除失败", code: 201 };
     } else {
+      //删除关联模块ID
+      await relationModuleidDB.findByIdAndRemove(ctx.request.body.id)
       ctx.body = { message: "删除成功", code: 200 };
 
     }

@@ -39,12 +39,12 @@ async function create(obj) {
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,
         api_body_desc,api_type,is_mockjs,api_lazy_time,
-        sql_sentence,api_desc,createtime,api_req_header,api_req_header_desc,api_status) 
+        sql_sentence,api_desc,createtime,api_req_header,api_req_header_desc,api_status,relation_moduleid) 
     values 
     ('${obj.projectid}','${obj.moduleid}','${obj.apiname}','${obj.apiurl}'
     ,'${obj.apicontent}','${obj.apicontentdesc}','${obj.apiheaderdesc}','${obj.apiparmsdesc}'
     ,'${obj.apibodydesc}','${obj.apitype}','${obj.ismockjs}','${obj.apilazytime}'
-    ,'${obj.sqlsentence}','${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}')`;
+    ,'${obj.sqlsentence}','${obj.apidesc}','${obj.createtime}','${obj.apireqheader}','${obj.apireqheaderdesc}','${obj.apistatus}','${obj.relationModuleid}')`;
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             return res
@@ -141,6 +141,8 @@ async function findByPid(id) {
 //查找数据
 async function find({ searchval = '', projectid = '', moduleid = '', starLimit = 0, endLimit = 10 } = {}) {
     searchval = replaceSingleQuotes(searchval)
+
+
     let sql = `select a.projectname,b.modulename,
     c.mockid,c.api_name,c.api_url,c.api_type,c.api_status
     from cross_project a,cross_module b,cross_interface c 
@@ -148,14 +150,38 @@ async function find({ searchval = '', projectid = '', moduleid = '', starLimit =
     and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')
     and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)
     and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
+    UNION all
+	select a.projectname, d.module_name as modulename, c.mockid,c.api_name,c.api_url,c.api_type,c.api_status 
+	from cross_project a,cross_module b,cross_interface c,cross_relation d 
+	where a.pid=b.projectid
+    and (d.mock_id=c.mockid)		
+    and (b.mid = c.moduleid)
+    and (b.mid!=d.module_id)
+    and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')     
+    and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)        
+    and (d.module_id = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
     order by mockid desc
     limit ${starLimit}, ${endLimit}`
-    let totalSql = `select count(*) 
-    from cross_project a,cross_module b,cross_interface c 
-    where a.pid=c.projectid and b.mid=c.moduleid
-    and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')
-    and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)
-    and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)`
+
+    let totalSql = `select count(*) from ( 
+        select a.projectname,b.modulename,c.mockid,c.api_name,c.api_url,c.api_type,c.api_status
+            from cross_project a,cross_module b,cross_interface c 
+            where a.pid=c.projectid and b.mid=c.moduleid
+            and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')
+            and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)
+            and (c.moduleid = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
+            UNION all
+            select a.projectname, d.module_name as modulename, c.mockid,c.api_name,c.api_url,c.api_type,c.api_status 
+            from cross_project a,cross_module b,cross_interface c,cross_relation d 
+            where a.pid=b.projectid
+            and (d.mock_id=c.mockid)		
+            and (b.mid = c.moduleid)
+            and (b.mid!=d.module_id)
+            and (c.api_name like '%${searchval}%' or c.api_url like '%${searchval}%')     
+            and (c.projectid = '${projectid}' or '${projectid}' ='' or '${projectid}' is null)        
+            and (d.module_id = '${moduleid}' or '${moduleid}' ='' or '${moduleid}' is null)
+        ) t`
+
     let result = await allSqlAction.allSqlAction(sql)
     let count = await allSqlAction.allSqlAction(totalSql)
     return { rows: result, totals: count[0]["count(*)"] }
@@ -199,10 +225,10 @@ async function findByIdAndUpdate(id, obj) {
     api_req_header_desc = '${obj.apireqheaderdesc}',
     api_status = '${obj.apistatus}',
     rcode = '${obj.rcode}',
-    sql_sentence = '${obj.sqlsentence}'
+    sql_sentence = '${obj.sqlsentence}',
+    relation_moduleid = '${obj.relationModuleid}'
     WHERE mockid = '${id}'`;
     let fileList = obj.fileList
-    console.info(fileList)
     return allSqlAction.allSqlAction(sql).then(res => {
         if (res.affectedRows == 1) {
             fileList.forEach(async item => {
@@ -243,6 +269,42 @@ async function findByMidAndRemove(id) {
     })
 }
 
+//根据项目ID导出WORD
+async function findByPidExportWord(id) {
+    let sql = `select a.projectname,b.modulename,
+    c.mockid,c.projectid,c.moduleid,c.api_name,
+    c.api_url,c.api_content,c.api_content_desc,
+    c.api_header_desc,c.api_parms_desc,c.api_body_desc,
+    c.api_type,c.is_mockjs,c.api_lazy_time,c.api_desc,
+    c.createtime,c.api_req_header,c.api_req_header_desc,
+    c.api_status,c.rcode
+    from cross_project a,cross_module b,cross_interface c
+    where a.pid=c.projectid 
+		and b.mid=c.moduleid 
+		and c.projectid = '${id}' 
+		UNION ALL
+		select a.projectname,d.module_name,
+    c.mockid,c.projectid,d.module_id,c.api_name,
+    c.api_url,c.api_content,c.api_content_desc,
+    c.api_header_desc,c.api_parms_desc,c.api_body_desc,
+    c.api_type,c.is_mockjs,c.api_lazy_time,c.api_desc,
+    c.createtime,c.api_req_header,c.api_req_header_desc,
+    c.api_status,c.rcode 
+		from
+		cross_project a,cross_module b,cross_interface c,cross_relation d 
+		where 
+		a.pid=b.projectid
+		and d.mock_id=c.mockid		
+		and b.mid = c.moduleid
+		and b.mid!=d.module_id
+		and d.project_id = '${id}'
+		order by moduleid desc`
+
+    return allSqlAction.allSqlAction(sql).then(res => {
+        return res
+    })
+}
+
 module.exports = {
     check,
     find,
@@ -253,5 +315,6 @@ module.exports = {
     findByIdAndUpdate,
     findByIdAndRemove,
     findByPidAndRemove,
-    findByMidAndRemove
+    findByMidAndRemove,
+    findByPidExportWord
 }

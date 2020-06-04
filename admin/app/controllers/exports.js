@@ -6,7 +6,7 @@ class ExportsCtl {
   //导出WORD
   async exportWord(ctx) {
     try {
-      const result = await DB.findByPid(ctx.request.body.id)
+      const result = await DB.findByPidExportWord(ctx.request.body.id)
       let docx = await generate(result);
       let fileUrl = `${IP.address()}:${serviceport}/download/${docx}`
       if (docx) {
