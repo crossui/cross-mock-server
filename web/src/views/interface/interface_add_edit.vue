@@ -119,6 +119,12 @@
               <div class="clearfix margin-bottom-5">
                 <v-button
                   size="small"
+                  class="editable-add-btn fr margin-left-10"
+                  type="primary"
+                  @click="handleClickImport('header')"
+                >导入</v-button>
+                <v-button
+                  size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleClickInModal('header')"
@@ -146,6 +152,12 @@
               <div class="clearfix margin-bottom-5">
                 <v-button
                   size="small"
+                  class="editable-add-btn fr margin-left-10"
+                  type="primary"
+                  @click="handleClickImport('get')"
+                >导入</v-button>
+                <v-button
+                  size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleClickInModal('get')"
@@ -171,6 +183,12 @@
             </v-form-item>
             <v-form-item label="body参数说明">
               <div class="clearfix margin-bottom-5">
+                <v-button
+                  size="small"
+                  class="editable-add-btn fr margin-left-10"
+                  type="primary"
+                  @click="handleClickImport('body')"
+                >导入</v-button>
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
@@ -212,6 +230,12 @@
               <div class="clearfix margin-bottom-5">
                 <v-button
                   size="small"
+                  class="editable-add-btn fr margin-left-10"
+                  type="primary"
+                  @click="handleClickImport('outHeader')"
+                >导入</v-button>
+                <v-button
+                  size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleRespondModal('header')"
@@ -240,6 +264,12 @@
             </v-form-item>
             <v-form-item label="响应参数说明" class="vcu-form-item-required">
               <div class="clearfix margin-bottom-5">
+                <v-button
+                  size="small"
+                  class="editable-add-btn fr margin-left-10"
+                  type="primary"
+                  @click="handleClickImport('outBody')"
+                >导入</v-button>
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
@@ -350,6 +380,10 @@
             <v-textarea :rows="6" v-model="formReModal.desc"></v-textarea>
           </v-form-item>
         </v-form>
+      </v-modal>
+
+      <v-modal v-model="visibleImport" title="导入" :maskClosable="false" @ok="handleOkImport">
+        <v-textarea v-model="valueImport" :rows="10" />
       </v-modal>
     </div>
     <iframe name="myIframe" style="display:none"></iframe>
@@ -557,6 +591,51 @@ const getBase64 = (img, callback) => {
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
+
+const readerDatasJson = (res, type) => {
+  let list = null;
+  let json = [];
+  if (res.length > 0) {
+    list = res[0];
+  } else {
+    list = res;
+  }
+
+  for (let x in list) {
+    let item = {
+      name: x,
+      type: transformationType(typeof list[x]),
+      desc: ""
+    };
+    if (type) {
+      item.must = "No";
+    }else{
+      item.value = list[x];
+    }
+    json.push(item);
+  }
+
+  return json;
+};
+
+const transformationType = val => {
+  let value = "String";
+  switch (val) {
+    case "number":
+      value = "Int";
+      break;
+    case "boolean":
+      value = "Boolean";
+      break;
+    case "object":
+      value = "JSONObject";
+      break;
+    case "array":
+      value = "Array";
+      break;
+  }
+  return value;
+};
 export default {
   data() {
     return {
@@ -743,7 +822,11 @@ export default {
           { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
         ],
         desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }]
-      }
+      },
+
+      typeImport: "",
+      visibleImport: false,
+      valueImport: ""
     };
   },
   computed: {
@@ -802,7 +885,10 @@ export default {
       this.mockId = res.mockid;
       this.formValidate1.projectid = res.projectid;
       this.formValidate1.moduleid = { value: res.moduleid.toString() };
-      this.formValidate1.relationModuleid = JSON.parse(res.relation_moduleid);
+      this.formValidate1.relationModuleid =
+        res.relation_moduleid == "" || res.relation_moduleid == "undefined"
+          ? undefined
+          : JSON.parse(res.relation_moduleid);
       this.formValidate1.apitype = res.api_type;
       this.formValidate1.apiname = res.api_name;
       this.formValidate1.apiurl = res.api_url;
@@ -1404,6 +1490,39 @@ export default {
       }
       //return isJPG && isLt2M;
       return isLt2M;
+    },
+    //导入参数数据
+    handleClickImport(type) {
+      this.typeImport = type;
+      this.visibleImport = true;
+    },
+    //导入参数确认
+    handleOkImport() {
+      this.visibleImport = false;
+      let _valueImport = null;
+      try {
+        _valueImport = JSON.parse(this.valueImport);
+      } catch (err) {
+        this.$message.error("请传入标准JSON格式");
+        return;
+      }
+      switch (this.typeImport) {
+        case "header":
+          this.formValidate2.headerVal = readerDatasJson(_valueImport, true);
+          break;
+        case "get":
+          this.formValidate2.getVal = readerDatasJson(_valueImport, true);
+          break;
+        case "body":
+          this.formValidate2.bodyVal = readerDatasJson(_valueImport, true);
+          break;
+        case "outHeader":
+          this.formValidate3.headerVal = readerDatasJson(_valueImport, false);
+          break;
+        case "outBody":
+          this.formValidate3.respondVal = readerDatasJson(_valueImport, false);
+          break;
+      }
     }
   }
 };

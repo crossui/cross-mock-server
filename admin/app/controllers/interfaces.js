@@ -48,7 +48,7 @@ class InterfaceCtl {
     } else {
       let res = await DB.create(ctx.request.body)
       //关联项目ID
-      if (relationModuleid != "") {
+      if (relationModuleid && relationModuleid != "" && relationModuleid != "null" && relationModuleid != "undefined") {
         let _relation = JSON.parse(relationModuleid);
         _relation.forEach(async item => {
           await relationModuleidDB.create({
@@ -105,7 +105,7 @@ class InterfaceCtl {
     } else {
       //更新关联模块ID
       await relationModuleidDB.findByIdAndRemove(ctx.params.id)
-      if (relationModuleid != "") {
+      if (relationModuleid && relationModuleid != "" && relationModuleid != "null" && relationModuleid != "undefined") {
         let _relation = JSON.parse(relationModuleid);
         _relation.forEach(async item => {
           await relationModuleidDB.create({
