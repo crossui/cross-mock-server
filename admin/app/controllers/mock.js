@@ -22,10 +22,18 @@ class MockCtl {
       try {
         const p = await DB.findByPid(pathNode[1]); // 根据项目的ID找到项目信息以获取项目的唯一ID
         if (p.length > 0) {
+          
           let mockUrl = pathNode[2]
           const rows = p.filter(item => {
-            return pathToRegexp(item.api_url).exec(mockUrl); // pathToRegexp 匹配url表达式
+            let itemurlArr = item.api_url.split('?')
+            if(itemurlArr.length > 1){
+              //接口带？号
+              return item.api_url === `${pathNode[2]}?${ctx.request.url.split('?')[1]}`
+            }else{
+              return pathToRegexp(item.api_url).exec(mockUrl); // pathToRegexp 匹配url表达式
+            }
           });
+          
           if (rows.length == 0) throw "";
           let result = JSON.parse(rows[0].api_content)
           if (rows[0].is_mockjs === 0) {
