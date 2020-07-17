@@ -34,7 +34,6 @@ async function create(obj) {
     obj.apireqheaderdesc = replaceSingleQuotes(obj.apireqheaderdesc)
     obj.sqlsentence = replaceSingleQuotes(obj.sqlsentence)
 
-
     let sql = `insert into cross_interface 
     (projectid,moduleid,api_name,api_url,api_content,
         api_content_desc,api_header_desc,api_parms_desc,

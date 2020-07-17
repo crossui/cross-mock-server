@@ -41,6 +41,7 @@ const createMkdir = (str) => {
 const replaceSingleQuotes = (str) => {
     if (!str) return str
     str = str.toString()
+    str=str.replace(/\\/g, "\\\\");
     return str.replace(/\'/g, "\\'");
 };
 

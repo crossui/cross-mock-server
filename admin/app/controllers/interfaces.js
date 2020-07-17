@@ -41,7 +41,6 @@ class InterfaceCtl {
       apistatus: { type: 'string', required: true }
     });
     const { apiname, apiurl, projectid, moduleid, fileList, relationModuleid } = ctx.request.body;
-
     const repeated = await DB.check({ apiname, apiurl, projectid, moduleid });
     if (repeated) {
       ctx.body = { message: "同一项目且同一模块下不可以有一样的接口名称或地址", code: 409 }

@@ -1,5 +1,5 @@
 /*数据库默认配置*/
-const database = {
+/* const database = {
     database: 'mock_server', //数据库名称
     user: 'root', //mysql用户名
     password: 'root123', //mysql密码
@@ -11,9 +11,9 @@ const database = {
 const serviceport = "8033";
 
 
-module.exports = { database, serviceport }
+module.exports = { database, serviceport } */
 
-/* 
+
 const database = {
     database: 'cross_mock_server', //数据库名称
     user: 'root', //mysql用户名
@@ -24,6 +24,6 @@ const database = {
 };
 
 const serviceport = "8033";
- */
+
 
 module.exports = { database, serviceport }
