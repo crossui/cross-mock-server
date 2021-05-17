@@ -1,11 +1,13 @@
 <template>
   <div>
-    <v-card :bodyStyle="{padding: '100px'}">
+    <v-card :bodyStyle="{ padding: '100px' }">
       <div class="text-center">
-        <v-icon type="check-circle" size="120" color="#52c41a"></v-icon>
-        <div class="margin-top-30">
+        <v-icon type="check-circle" class="success-icon"></v-icon>
+        <div class="mt-30">
           <v-button size="large" @click="handleBack">返回列表</v-button>
-          <v-button size="large" @click="handleView" class="margin-left-20">查看接口</v-button>
+          <v-button size="large" @click="handleView" class="ml-20"
+            >查看接口</v-button
+          >
         </div>
       </div>
     </v-card>
@@ -20,18 +22,26 @@ export default {
   },
   methods: {
     handleBack() {
-      this.$router.go(-2);
+      const formPath = this.$store.state.app.fromPath;
+      this.$router.push({
+        name: formPath.name,
+        query: formPath.query,
+      });
     },
     handleView() {
       this.$router.push({
         name: "interface_postman",
         query: {
-          id: this.$route.query.mockid
-        }
+          id: this.$route.query.mockid,
+        },
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>
+.success-icon {
+  font-size: 120px;
+  color: #52c41a;
+}
 </style>

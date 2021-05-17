@@ -304,6 +304,45 @@ async function findByPidExportWord(id) {
     })
 }
 
+
+//根据项目ID和模块ID导出WORD
+async function findByPidExportWordModels(id,mids) {
+    let sql = `select a.projectname,b.modulename,
+    c.mockid,c.projectid,c.moduleid,c.api_name,
+    c.api_url,c.api_content,c.api_content_desc,
+    c.api_header_desc,c.api_parms_desc,c.api_body_desc,
+    c.api_type,c.is_mockjs,c.api_lazy_time,c.api_desc,
+    c.createtime,c.api_req_header,c.api_req_header_desc,
+    c.api_status,c.rcode
+    from cross_project a,cross_module b,cross_interface c
+    where a.pid=c.projectid 
+		and b.mid=c.moduleid 
+		and c.projectid = '${id}'  
+		and c.moduleid in (${mids})
+		UNION ALL
+		select a.projectname,d.module_name,
+    c.mockid,c.projectid,d.module_id,c.api_name,
+    c.api_url,c.api_content,c.api_content_desc,
+    c.api_header_desc,c.api_parms_desc,c.api_body_desc,
+    c.api_type,c.is_mockjs,c.api_lazy_time,c.api_desc,
+    c.createtime,c.api_req_header,c.api_req_header_desc,
+    c.api_status,c.rcode 
+		from
+		cross_project a,cross_module b,cross_interface c,cross_relation d 
+		where 
+		a.pid=b.projectid
+		and d.mock_id=c.mockid		
+		and b.mid = c.moduleid
+		and b.mid!=d.module_id
+		and d.project_id = '${id}'
+		and c.moduleid in (${mids})
+		order by moduleid desc`
+
+    return allSqlAction.allSqlAction(sql).then(res => {
+        return res
+    })
+}
+
 module.exports = {
     check,
     find,
@@ -315,5 +354,6 @@ module.exports = {
     findByIdAndRemove,
     findByPidAndRemove,
     findByMidAndRemove,
-    findByPidExportWord
+    findByPidExportWord,
+    findByPidExportWordModels
 }

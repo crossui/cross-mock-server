@@ -1,5 +1,5 @@
 <template>
-    <v-breadcrumb>
+    <v-breadcrumb class="pt-20">
         <v-breadcrumb-item v-for="item in currentPath" :to="item.path" :key="item.name">{{ itemTitle(item) }}</v-breadcrumb-item>
     </v-breadcrumb>
 </template>

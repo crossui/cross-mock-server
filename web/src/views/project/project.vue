@@ -1,11 +1,21 @@
 <template>
   <div>
-    <v-card title="项目列表" :bodyStyle="{padding: '0px'}">
+    <v-card title="项目列表" :bodyStyle="{ padding: '0px' }">
       <div class="split-wrap">
-        <v-split v-model="splitVal">
-          <div slot="left" class="split-pane split-pane-left">
-            <div class="clearfix margin-bottom-15">
-              <v-button type="primary" size="small" class="fr" @click="handleAddProjectClick">新增</v-button>
+        <splitpanes>
+          <pane
+            size="30"
+            key="split-pane-left"
+            class="split-pane split-pane-left"
+          >
+            <div class="clearfix mb-15">
+              <v-button
+                type="primary"
+                size="small"
+                class="fr"
+                @click="handleAddProjectClick"
+                >新增</v-button
+              >
             </div>
             <v-list
               :dataSource="projectListData"
@@ -16,21 +26,27 @@
             >
               <v-list-item
                 slot="renderItem"
-                slot-scope="item, index"
+                slot-scope="item"
                 key="item.pid"
-                v-bind:class="{'selected': item.pid == selectedProject}"
+                v-bind:class="{ selected: item.pid == selectedProject }"
                 @click="handleSelectProj(item)"
               >
                 <v-button-group size="small" slot="actions">
-                  <v-button icon="edit" @click="() => handleEidtProj(item)"></v-button>
-                  <v-button icon="delete" @click="() => handleDeleteProj(item)"></v-button>
+                  <v-button
+                    icon="edit"
+                    @click="() => handleEidtProj(item)"
+                  ></v-button>
+                  <v-button
+                    icon="delete"
+                    @click="() => handleDeleteProj(item)"
+                  ></v-button>
                 </v-button-group>
-                <span>{{item.projectname}}</span>
+                <span>{{ item.projectname }}</span>
               </v-list-item>
             </v-list>
-          </div>
-          <div slot="right" class="split-pane split-pane-right">
-            <div class="clearfix margin-bottom-15">
+          </pane>
+          <pane key="split-pane-right" class="split-pane split-pane-right">
+            <div class="clearfix mb-15">
               <div class="fl">
                 <v-input-search
                   placeholder="模块名称"
@@ -41,10 +57,16 @@
                   v-model="searchModuleName"
                 ></v-input-search>
               </div>
-              <v-button type="primary" size="small" class="fr" @click="handleAddModulesClick">新增</v-button>
+              <v-button
+                type="primary"
+                size="small"
+                class="fr"
+                @click="handleAddModulesClick"
+                >新增</v-button
+              >
             </div>
             <v-table
-              :rowKey="record => record.mid"
+              :rowKey="(record) => record.mid"
               :indentSize="30"
               :columns="columns"
               :dataSource="tabledata"
@@ -55,19 +77,29 @@
               @change="handleTableChange"
               bordered
             >
-              <template slot="operation" slot-scope="text, record, index">
+              <template slot="operation" slot-scope="text, record">
                 <div class="editable-row-operations">
                   <v-button-group size="small">
-                    <v-button @click="() => handleAddChildModule(record)" v-if="!record.child">添加</v-button>
-                    <v-button @click="() => handleEidtModule(record)">编辑</v-button>
-                    <v-button @click="() => handleDeleteModule(record)">删除</v-button>
-                    <v-button @click="() => handleView(record)">查看接口</v-button>
+                    <v-button
+                      @click="() => handleAddChildModule(record)"
+                      v-if="!record.child"
+                      >添加</v-button
+                    >
+                    <v-button @click="() => handleEidtModule(record)"
+                      >编辑</v-button
+                    >
+                    <v-button @click="() => handleDeleteModule(record)"
+                      >删除</v-button
+                    >
+                    <v-button @click="() => handleView(record)"
+                      >查看接口</v-button
+                    >
                   </v-button-group>
                 </div>
               </template>
             </v-table>
-          </div>
-        </v-split>
+          </pane>
+        </splitpanes>
       </div>
     </v-card>
 
@@ -78,11 +110,17 @@
       @cancel="handleProjCancel"
       :maskClosable="false"
     >
-      <v-form ref="formproj" :model="formProj" :rules="ruleProj" :label-width="50">
-        <v-form-item label="名称" prop="projectname">
+      <v-form-model
+        ref="formproj"
+        :model="formProj"
+        :rules="ruleProj"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <v-form-model-item label="名称" prop="projectname">
           <v-input type="text" v-model="formProj.projectname" />
-        </v-form-item>
-      </v-form>
+        </v-form-model-item>
+      </v-form-model>
     </v-modal>
 
     <v-modal
@@ -92,14 +130,24 @@
       @cancel="handleModleCancel"
       :maskClosable="false"
     >
-      <v-form ref="formModle" :model="formModle" :rules="ruleModle" :label-width="80">
-        <v-form-item label="上级模块" prop="pmid">
-          <v-select v-model="formModle.pmid" style="width:100%" :options="pmidOptions"></v-select>
-        </v-form-item>
-        <v-form-item label="名称" prop="modulename">
+      <v-form-model
+        ref="formModle"
+        :model="formModle"
+        :rules="ruleModle"
+        :label-col="labelCol"
+        :wrapper-col="wrapperCol"
+      >
+        <v-form-model-item label="上级模块" prop="pmid">
+          <v-select
+            v-model="formModle.pmid"
+            style="width: 100%"
+            :options="pmidOptions"
+          ></v-select>
+        </v-form-model-item>
+        <v-form-model-item label="名称" prop="modulename">
           <v-input type="text" v-model="formModle.modulename" />
-        </v-form-item>
-      </v-form>
+        </v-form-model-item>
+      </v-form-model>
     </v-modal>
   </div>
 </template>
@@ -107,18 +155,18 @@
 <script>
 import Util from "@/libs/util";
 
-const convertSelectData = data => {
+const convertSelectData = (data) => {
   let result = [
     {
       label: "顶级模块",
-      value: "0"
-    }
+      value: "0",
+    },
   ];
-  data.forEach(item => {
+  data.forEach((item) => {
     if (item.pmid === 0) {
       result.push({
         label: item.modulename,
-        value: item.mid.toString()
+        value: item.mid.toString(),
       });
     }
   });
@@ -133,7 +181,7 @@ const convertToTreeData = (data, pid) => {
       let obj = data[i];
       temp = convertToTreeData(data, data[i].mid);
       if (temp.length > 0) {
-        temp.forEach(item => {
+        temp.forEach((item) => {
           item.child = true;
         });
         obj.children = temp;
@@ -149,6 +197,8 @@ export default {
   name: "project_index",
   data() {
     return {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
       listLoading: false,
       projVisible: false,
       projModalType: true,
@@ -156,22 +206,22 @@ export default {
         size: "small",
         simple: true,
         total: 1,
-        onChange: page => {
+        onChange: (page) => {
           this.onShowSizeChange(page);
-        }
+        },
       },
       formProj: {
-        projectname: ""
+        projectname: "",
       },
       ruleProj: {
         projectname: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
-        ]
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
+        ],
       },
       projectListData: [],
       selectedProject: "",
@@ -182,25 +232,24 @@ export default {
       pmidOptions: [],
       formModle: {
         modulename: "",
-        pmid: "0"
+        pmid: "0",
       },
       ruleModle: {
         pmid: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         modulename: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
-        ]
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
+        ],
       },
-      splitVal: 0.3,
       tabledata: [],
       expandedRowKeys: [],
       //pagination: { showQuickJumper: true },
@@ -208,15 +257,15 @@ export default {
       columns: [
         {
           title: "模块名称",
-          dataIndex: "modulename"
+          dataIndex: "modulename",
         },
         {
           title: "操作",
           width: "30%",
           scopedSlots: { customRender: "operation" },
-          align: "center"
-        }
-      ]
+          align: "center",
+        },
+      ],
     };
   },
   mounted() {
@@ -234,10 +283,10 @@ export default {
         url: `/projects`,
         params: {
           page: pageNum,
-          pagesize: 10
-        }
+          pagesize: 10,
+        },
       })
-        .then(res => {
+        .then((res) => {
           if (res) {
             this.projectListData = res.data.rows;
             this.selectedProject = res.data.rows.length
@@ -248,7 +297,7 @@ export default {
           }
           this.listLoading = false;
         })
-        .catch(err => {
+        .catch((err) => {
           this.listLoading = false;
         });
     },
@@ -259,10 +308,10 @@ export default {
     },
     //项目新增确认
     handleProjOk() {
-      this.$refs["formproj"].validate(valid => {
+      this.$refs["formproj"].validate((valid) => {
         if (valid) {
           let params = {
-            projectname: this.formProj.projectname
+            projectname: this.formProj.projectname,
           };
           let method = "POST";
           let url = "/projects";
@@ -275,8 +324,8 @@ export default {
           this.$request({
             method,
             url,
-            data: params
-          }).then(res => {
+            data: params,
+          }).then((res) => {
             if (res) {
               this.$message.success(res.message);
               this.fetchProject(1);
@@ -313,21 +362,21 @@ export default {
               method: "POST",
               url: "/projects/delete",
               data: {
-                id: record.pid
-              }
+                id: record.pid,
+              },
             })
-            .then(res => {
+            .then((res) => {
               if (res) {
                 _this.$message.success(res.message);
                 _this.fetchProject(1);
               }
             });
-        }
+        },
       });
     },
     //选择项目
     handleSelectProj(record) {
-      this.searchModuleName = ""
+      this.searchModuleName = "";
       this.selectedProject = record.pid;
       this.fetch(1);
     },
@@ -345,23 +394,23 @@ export default {
           modulename: this.searchModuleName,
           projectid: this.selectedProject,
           page: pageNum,
-          pagesize: 10
-        }
-      }).then(res => {
+          pagesize: 10,
+        },
+      }).then((res) => {
         if (this.searchModuleName == "") {
           this.pmidOptions = convertSelectData(res.data.rows);
           this.tabledata = convertToTreeData(res.data.rows, 0);
           this.expandedRowKeys = this.tabledata
-            .map(item => {
+            .map((item) => {
               if (item.children) {
                 return item.mid;
               }
             })
-            .filter(item => {
+            .filter((item) => {
               return item != undefined;
             });
-        }else{
-          this.tabledata = res.data.rows
+        } else {
+          this.tabledata = res.data.rows;
         }
 
         /* this.pagination = Util.pager(this, this.pagination, {
@@ -386,12 +435,12 @@ export default {
     },
     //模块新增确认
     handleModleOk() {
-      this.$refs["formModle"].validate(valid => {
+      this.$refs["formModle"].validate((valid) => {
         if (valid) {
           let params = {
             modulename: this.formModle.modulename,
             projectid: this.selectedProject,
-            pmid: parseInt(this.formModle.pmid)
+            pmid: parseInt(this.formModle.pmid),
           };
           let method = "POST";
           let url = "/modules";
@@ -405,8 +454,8 @@ export default {
           this.$request({
             method,
             url,
-            data: params
-          }).then(res => {
+            data: params,
+          }).then((res) => {
             if (res) {
               this.$message.success(res.message);
               this.fetch(1);
@@ -438,8 +487,8 @@ export default {
         name: "interface_index",
         query: {
           pid: this.selectedProject,
-          mid: record.mid
-        }
+          mid: record.mid,
+        },
       });
     },
     //添加子级模块
@@ -460,19 +509,19 @@ export default {
               method: "POST",
               url: "/modules/delete",
               data: {
-                id: record.mid
-              }
+                id: record.mid,
+              },
             })
-            .then(res => {
+            .then((res) => {
               if (res) {
                 _this.$message.success(res.message);
                 _this.fetch(1);
               }
             });
-        }
+        },
       });
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less" scoped>

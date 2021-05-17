@@ -22,6 +22,7 @@ const app = {
             path: '/',
             name: 'home_index'
         }], // 面包屑数组
+        fromPath: null,
         cachePage: [],
         dontCache: [] // 在这里定义你不想要缓存的页面的name属性值(参见路由配置router.js)
     },
@@ -79,6 +80,9 @@ const app = {
             })
             names.push("ParentView") //多级路由手动添加成缓存
             state.cachePage = names
+        },
+        setFromPath(state, from) {
+            state.fromPath = from;
         }
     }
 };

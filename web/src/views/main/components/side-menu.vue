@@ -1,5 +1,4 @@
 <template>
-  <v-scrollbar :style="{height:menuHeight + 'px'}" :zIndex="10000">
     <v-menu
       theme="dark"
       mode="inline"
@@ -19,7 +18,6 @@
         <sub-menu v-else :menuInfo="item" :key="item.name" />
       </template>
     </v-menu>
-  </v-scrollbar>
 </template>
 
 <script>

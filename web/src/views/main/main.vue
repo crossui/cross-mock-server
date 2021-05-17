@@ -11,17 +11,20 @@
           <div class="navicon-con fl">
             <v-icon
               class="trigger"
-              :type="collapsed ? 'indent' : 'outdent'"
-              @click="()=> collapsed = !collapsed"
+              :type="collapsed ? 'menu-unfold' : 'menu-fold'"
+              @click="() => (collapsed = !collapsed)"
             ></v-icon>
           </div>
           <div class="breadcrumb-con fl">
             <breadcrumb-nav :currentPath="currentPath"></breadcrumb-nav>
           </div>
-          <div class="avator-con fr margin-right-15">
-            <div @click="handleRefreshPage" class="refresh-current-page-btn fl margin-right-10">
+          <div class="avator-con fr mr-15">
+            <div
+              @click="handleRefreshPage"
+              class="refresh-current-page-btn fl mr-10"
+            >
               <v-tooltip title="刷新当前页" placement="bottom">
-                <v-icon type="reload" :size="22"></v-icon>
+                <v-icon type="reload"></v-icon>
               </v-tooltip>
             </div>
             <!-- <v-row type="flex" justify="end" align="middle" class="user-dropdown-innercon margin-left-20">
@@ -40,7 +43,7 @@
           </div>
         </div>
       </v-layout-header>
-      <v-layout-content :style="{overflow: 'hidden', height: '100%'}">
+      <v-layout-content :style="{ overflow: 'hidden', height: '100%' }">
         <div class="content-wrapper">
           <div class="single-page" v-if="loadingRefresh">
             <transition name="fade-transform" mode="out-in">
@@ -67,13 +70,13 @@ export default {
   components: {
     SideMenu,
     menuClock,
-    breadcrumbNav
+    breadcrumbNav,
   },
   data() {
     return {
       loadingRefresh: true,
       collapsed: false,
-      userName: "admin"
+      userName: "admin",
     };
   },
   computed: {
@@ -85,12 +88,22 @@ export default {
     },
     currentPath() {
       return this.$store.state.app.currentPath; // 当前面包屑数组
-    }
+    },
   },
   watch: {
-    $route(to) {
+    $route(to, from) {
+      if (["interface_add", "interface_edit"].includes(to.name)) {
+        util.setFromPath(this, {
+          fullPath: from.fullPath,
+          meta: from.meta,
+          name: from.name,
+          params: from.params,
+          path: from.path,
+          query: from.query,
+        });
+      }
       util.setCurrentPath(this, to);
-    }
+    },
   },
   mounted() {
     //this.userName = Cookies.get("user");
@@ -103,26 +116,26 @@ export default {
     handleClickUserDropdown(name) {
       if (name.key === "ownSpace") {
         this.$router.push({
-          name: "ownspace_index"
+          name: "ownspace_index",
         });
       } else {
         this.$store.commit("setTagNavList", [
           {
             title: "首页",
             path: "/",
-            name: "home_index"
-          }
+            name: "home_index",
+          },
         ]);
         this.$store.commit("logout", this);
         this.$router.push({
-          name: "login"
+          name: "login",
         });
       }
     },
     handleRefreshPage() {
       util.domReset(this, "loadingRefresh");
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">

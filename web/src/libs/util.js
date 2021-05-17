@@ -135,6 +135,15 @@ util.setCurrentPath = function (vm, items) {
 };
 
 /**
+ * @param {*} from 对象
+ * @param {*} vm 对象
+ * @description 设置从别的页面跳转的路径
+ */
+util.setFromPath = (vm, from) => {
+    vm.$store.commit("setFromPath", from);
+}
+
+/**
  * @param {*} item 对象
  * @param {*} vm 对象
  * @description 返回路由TITLE
@@ -243,10 +252,10 @@ util.pager = function (vm, pagination, page) {
  * @param str   
  **/
 util.replaceQuotes = function (str) {
-    if(!str) return str
+    if (!str) return str
     str = str.toString()
     str = str.replace(/\"/g, "'");
-    str = str.replace(/\s+/g,"");
+    str = str.replace(/\s+/g, "");
     return str.replace(/\r\n/g, "");
 };
 export default util;

@@ -19,6 +19,19 @@ class ExportsCtl {
     }
 
   };
+
+  //按模块导出WORD
+  async exportWordModels(ctx) {
+    try {
+      const result = await DB.findByPidExportWordModels(ctx.request.body.pid, ctx.request.body.mids)
+      let docx = await generate(result);
+      let fileUrl = `${IP.address()}:${serviceport}/download/${docx}`
+      ctx.body = { message: "导出成功", data: { fileUrl }, code: 200 };
+    } catch (err) {
+      ctx.body = { message: "导出失败", code: 201 };
+    }
+  };
+
   //导出PDF
   async exportPdf(ctx) {
 

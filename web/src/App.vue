@@ -1,22 +1,31 @@
 <template>
-  <v-locale-provider :locale="zh_CN">
+  <v-config-provider :getPopupContainer="getPopupContainer" :locale="zh_CN">
     <div id="app">
       <router-view />
     </div>
-  </v-locale-provider>
+  </v-config-provider>
 </template>
 
 <script>
-import zh_CN from 'vcu/dist/locale/zh_CN';
-import 'moment/locale/zh-cn';
+import zh_CN from "vcu/dist/locale/zh_CN";
+import "moment/locale/zh-cn";
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       zh_CN,
-    }
-  }
-}
+    };
+  },
+  methods: {
+    getPopupContainer(el, dialogContext) {
+      if (dialogContext) {
+        return dialogContext.getDialogWrap();
+      } else {
+        return document.body;
+      }
+    },
+  },
+};
 </script>
 
 <style lang="less">

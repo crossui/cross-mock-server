@@ -12,7 +12,7 @@
             </v-button>
           </v-button-group>
         </template>
-        <div class="clearfix margin-bottom-15">
+        <div class="clearfix mb-15">
           <div class="fl">
             <v-input-search
               size="small"
@@ -33,13 +33,13 @@
           @change="handleTableChange"
           bordered
         >
-          <template slot="apitype" slot-scope="text, record, index">{{apiTypeFun(record.api_type)}}</template>
-          <template slot="apistatus" slot-scope="text, record, index">
+          <template slot="apitype" slot-scope="text, record">{{apiTypeFun(record.api_type)}}</template>
+          <template slot="apistatus" slot-scope="text, record">
             <v-tag
               :color="record.api_status == '0' ? 'red' : record.api_status == '1' ? 'green' : record.api_status == '2' ? 'blue' : 'orange'"
             >{{apistatusFun(record.api_status)}}</v-tag>
           </template>
-          <template slot="operation" slot-scope="text, record, index">
+          <template slot="operation" slot-scope="text, record">
             <div class="editable-row-operations">
               <v-button-group size="small">
                 <v-button @click="() => handleEidt(record)">编辑</v-button>

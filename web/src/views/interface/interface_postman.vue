@@ -13,11 +13,11 @@
           ></v-input-search>
         </v-input-group>
       </v-card>
-      <div class="margin-top-20">
+      <div class="mt-20">
         <v-row :gutter="16">
           <v-col :span="12">
             <v-card title="图片">
-              <v-scrollbar class="scroll-help">
+              <scrollbar class="scroll-help">
                 <v-upload
                   action
                   class="mock-view-picture"
@@ -25,38 +25,48 @@
                   :file-list="fileList"
                   @preview="handlePreview"
                 ></v-upload>
-                <v-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+                <v-modal
+                  :visible="previewVisible"
+                  :footer="null"
+                  @cancel="handleCancel"
+                >
                   <img alt="example" style="width: 100%" :src="previewImage" />
                 </v-modal>
-              </v-scrollbar>
+              </scrollbar>
             </v-card>
           </v-col>
           <v-col :span="12">
             <v-card title="语句">
-              <v-scrollbar class="scroll-help">
-                <div class="mock-sqlsentence">{{sqlsentence}}</div>
-              </v-scrollbar>
+              <scrollbar class="scroll-help">
+                <div class="mock-sqlsentence">{{ sqlsentence }}</div>
+              </scrollbar>
             </v-card>
           </v-col>
         </v-row>
       </div>
-      <div class="margin-top-20">
-        <v-card title="响应数据" :bodyStyle="{padding: '0px'}">
+      <div class="mt-20">
+        <v-card title="响应数据" :bodyStyle="{ padding: '0px' }">
           <div class="split-wrap">
-            <v-split v-model="splitVal">
-              <div slot="left" class="split-pane split-pane-left">
+            <splitpanes :border="splitpanesborder">
+              <pane key="left" class="split-pane split-pane-left">
                 <h4>Headers</h4>
-                <v-scrollbar class="scroll-container">
-                  <json-viewer :value="jsonHeaders" :expand-depth="50"></json-viewer>
-                </v-scrollbar>
-              </div>
-              <div slot="right" class="split-pane split-pane-right">
+                <scrollbar class="scroll-container">
+                  <json-viewer
+                    :value="jsonHeaders"
+                    :expand-depth="50"
+                  ></json-viewer>
+                </scrollbar>
+              </pane>
+              <pane key="right" class="split-pane split-pane-right">
                 <h4>Body</h4>
-                <v-scrollbar class="scroll-container">
-                  <json-viewer :value="jsonBody" :expand-depth="50"></json-viewer>
-                </v-scrollbar>
-              </div>
-            </v-split>
+                <scrollbar class="scroll-container">
+                  <json-viewer
+                    :value="jsonBody"
+                    :expand-depth="50"
+                  ></json-viewer>
+                </scrollbar>
+              </pane>
+            </splitpanes>
           </div>
         </v-card>
       </div>
@@ -68,7 +78,7 @@
 import axios from "axios";
 import JsonViewer from "vue-json-viewer";
 
-const optionsApiType = type => {
+const optionsApiType = (type) => {
   let _type = "";
   switch (type) {
     case "0":
@@ -95,7 +105,7 @@ const optionsApiType = type => {
 export default {
   name: "interface_postman",
   components: {
-    JsonViewer
+    JsonViewer,
   },
   data() {
     return {
@@ -104,13 +114,16 @@ export default {
       fileList: [],
       sqlsentence: "",
       spinning: false,
-      splitVal: 0.3,
       apiType: "",
       apiPrefix: "",
       apiUrl: "",
       apilazytime: 0,
       jsonHeaders: {},
-      jsonBody: {}
+      jsonBody: {},
+      splitpanesborder: {
+        left: false,
+        right: false,
+      },
     };
   },
   mounted() {
@@ -134,7 +147,7 @@ export default {
       let id = this.$route.query.id;
       let res = await this.$request({
         method: "GET",
-        url: `/interfaces/mockid/${id}`
+        url: `/interfaces/mockid/${id}`,
       });
       return res;
     },
@@ -146,15 +159,15 @@ export default {
         url: `${this.apiPrefix}${this.apiUrl}`,
         timeout: this.apilazytime === 0 ? 8000 : (this.apilazytime + 2) * 1000,
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
-        }
+          "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        },
       })
-        .then(res => {
+        .then((res) => {
           this.jsonHeaders = res.headers;
           this.jsonBody = res.data;
           this.spinning = false;
         })
-        .catch(err => {
+        .catch((err) => {
           this.spinning = false;
         });
 
@@ -183,8 +196,8 @@ export default {
     },
     handleCancel() {
       this.previewVisible = false;
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">

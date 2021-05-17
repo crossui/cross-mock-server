@@ -13,24 +13,27 @@
           </v-button-group>
         </template>
         <v-tab-pane tab="基本信息" key="1">
-          <v-form
+          <v-form-model
             ref="formValidate1"
             :model="formValidate1"
             :rules="ruleValidate1"
-            :label-width="120"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
-            <v-form-item label="所属项目" prop="projectid">
+            <v-form-model-item label="所属项目" prop="projectid">
               <v-select
                 style="width: 420px"
                 @change="handleChangeProject"
                 v-model="formValidate1.projectid"
               >
-                <template v-for="item in optionsProject">
-                  <v-select-option :value="item.pid">{{item.projectname}}</v-select-option>
+                <template v-for="(item, index) in optionsProject">
+                  <v-select-option :value="item.pid" :key="index">{{
+                    item.projectname
+                  }}</v-select-option>
                 </template>
               </v-select>
-            </v-form-item>
-            <v-form-item label="所属模块" prop="moduleid">
+            </v-form-model-item>
+            <v-form-model-item label="所属模块" prop="moduleid">
               <v-tree-select
                 style="width: 420px"
                 :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
@@ -39,8 +42,8 @@
                 labelInValue
                 v-model="formValidate1.moduleid"
               ></v-tree-select>
-            </v-form-item>
-            <v-form-item label="关联模块" prop="relationModuleid">
+            </v-form-model-item>
+            <v-form-model-item label="关联模块" prop="relationModuleid">
               <v-tree-select
                 style="width: 420px"
                 :dropdownStyle="{ maxHeight: '400px', overflow: 'auto' }"
@@ -50,44 +53,52 @@
                 tree-checkable
                 v-model="formValidate1.relationModuleid"
               ></v-tree-select>
-            </v-form-item>
-            <v-form-item label="请求类型" prop="apitype">
+            </v-form-model-item>
+            <v-form-model-item label="请求类型" prop="apitype">
               <v-select
                 style="width: 420px"
                 v-model="formValidate1.apitype"
                 :options="optionsApiType"
               ></v-select>
-            </v-form-item>
-            <v-form-item label="状态" prop="apistatus">
+            </v-form-model-item>
+            <v-form-model-item label="状态" prop="apistatus">
               <v-select
                 style="width: 420px"
                 v-model="formValidate1.apistatus"
                 :options="optionsApiStatus"
               ></v-select>
-            </v-form-item>
-            <v-form-item label="接口名称" prop="apiname">
+            </v-form-model-item>
+            <v-form-model-item label="接口名称" prop="apiname">
               <v-input
                 type="text"
                 v-model="formValidate1.apiname"
                 style="width: 420px"
                 placeholder="请输入接口名称"
               />
-            </v-form-item>
-            <v-form-item label="接口地址" prop="apiurl">
+            </v-form-model-item>
+            <v-form-model-item label="接口地址" prop="apiurl">
               <v-input
                 type="text"
                 addonBefore="/"
                 v-model="formValidate1.apiurl"
                 placeholder="接口地址（如：api/user 或 api/:id）"
               />
-            </v-form-item>
-            <v-form-item label="接口描述" prop="apidesc">
-              <v-textarea :rows="4" v-model="formValidate1.apidesc" placeholder="请输入接口描述" />
-            </v-form-item>
-            <v-form-item label="语句" prop="sqlsentence">
-              <v-textarea :rows="4" v-model="formValidate1.sqlsentence" placeholder="请输入SQL语句" />
-            </v-form-item>
-            <v-form-item label="图片">
+            </v-form-model-item>
+            <v-form-model-item label="接口描述" prop="apidesc">
+              <v-textarea
+                :rows="4"
+                v-model="formValidate1.apidesc"
+                placeholder="请输入接口描述"
+              />
+            </v-form-model-item>
+            <v-form-model-item label="语句" prop="sqlsentence">
+              <v-textarea
+                :rows="4"
+                v-model="formValidate1.sqlsentence"
+                placeholder="请输入SQL语句"
+              />
+            </v-form-model-item>
+            <v-form-model-item label="图片">
               <v-upload
                 name="interface"
                 listType="picture-card"
@@ -103,32 +114,45 @@
                   <div class="vcu-upload-text">Upload</div>
                 </div>
               </v-upload>
-              <v-modal :visible="previewVisible" :footer="null" @cancel="handleCancelPreview">
+              <v-modal
+                :visible="previewVisible"
+                :footer="null"
+                @cancel="handleCancelPreview"
+              >
                 <img alt="example" style="width: 100%" :src="previewImage" />
               </v-modal>
-            </v-form-item>
-            <v-form-item label>
-              <v-button type="primary" @click="handleNextTabs('2')">下一步</v-button>
-            </v-form-item>
-          </v-form>
+            </v-form-model-item>
+            <v-form-model-item label=" " :colon="false">
+              <v-button type="primary" @click="handleNextTabs('2')"
+                >下一步</v-button
+              >
+            </v-form-model-item>
+          </v-form-model>
         </v-tab-pane>
 
         <v-tab-pane tab="请求参数设置" key="2">
-          <v-form ref="formValidate2" :model="formValidate2" :label-width="120">
-            <v-form-item label="Header参数说明">
-              <div class="clearfix margin-bottom-5">
+          <v-form-model
+            ref="formValidate2"
+            :model="formValidate2"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
+          >
+            <v-form-model-item label="Header参数说明">
+              <div class="clearfix mb-5">
                 <v-button
                   size="small"
-                  class="editable-add-btn fr margin-left-10"
+                  class="editable-add-btn fr ml-10"
                   type="primary"
                   @click="handleClickImport('header')"
-                >导入</v-button>
+                  >导入</v-button
+                >
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleClickInModal('header')"
-                >新增</v-button>
+                  >新增</v-button
+                >
               </div>
               <v-table
                 bordered
@@ -136,32 +160,40 @@
                 :columns="incolumns"
                 :dataSource="formValidate2.headerVal"
                 :pagination="false"
-                :scroll="{y: 240 }"
+                :scroll="{ y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtIn('header',record,index)">编辑</v-button>
-                      <v-button @click="() => handleDeleteIn('header',record,index)">删除</v-button>
+                      <v-button
+                        @click="() => handleEidtIn('header', record, index)"
+                        >编辑</v-button
+                      >
+                      <v-button
+                        @click="() => handleDeleteIn('header', record, index)"
+                        >删除</v-button
+                      >
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
-            </v-form-item>
-            <v-form-item label="Get参数说明">
-              <div class="clearfix margin-bottom-5">
+            </v-form-model-item>
+            <v-form-model-item label="Get参数说明">
+              <div class="clearfix mb-5">
                 <v-button
                   size="small"
-                  class="editable-add-btn fr margin-left-10"
+                  class="editable-add-btn fr ml-10"
                   type="primary"
                   @click="handleClickImport('get')"
-                >导入</v-button>
+                  >导入</v-button
+                >
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleClickInModal('get')"
-                >新增</v-button>
+                  >新增</v-button
+                >
               </div>
               <v-table
                 bordered
@@ -169,32 +201,40 @@
                 :columns="incolumns"
                 :dataSource="formValidate2.getVal"
                 :pagination="false"
-                :scroll="{y: 240 }"
+                :scroll="{ y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtIn('get',record,index)">编辑</v-button>
-                      <v-button @click="() => handleDeleteIn('get',record,index)">删除</v-button>
+                      <v-button
+                        @click="() => handleEidtIn('get', record, index)"
+                        >编辑</v-button
+                      >
+                      <v-button
+                        @click="() => handleDeleteIn('get', record, index)"
+                        >删除</v-button
+                      >
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
-            </v-form-item>
-            <v-form-item label="body参数说明">
-              <div class="clearfix margin-bottom-5">
+            </v-form-model-item>
+            <v-form-model-item label="body参数说明">
+              <div class="clearfix mb-5">
                 <v-button
                   size="small"
-                  class="editable-add-btn fr margin-left-10"
+                  class="editable-add-btn fr ml-10"
                   type="primary"
                   @click="handleClickImport('body')"
-                >导入</v-button>
+                  >导入</v-button
+                >
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleClickInModal('body')"
-                >新增</v-button>
+                  >新增</v-button
+                >
               </div>
               <v-table
                 bordered
@@ -202,44 +242,55 @@
                 :columns="incolumns"
                 :dataSource="formValidate2.bodyVal"
                 :pagination="false"
-                :scroll="{y: 240 }"
+                :scroll="{ y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtIn('body',record,index)">编辑</v-button>
-                      <v-button @click="() => handleDeleteIn('body',record,index)">删除</v-button>
+                      <v-button
+                        @click="() => handleEidtIn('body', record, index)"
+                        >编辑</v-button
+                      >
+                      <v-button
+                        @click="() => handleDeleteIn('body', record, index)"
+                        >删除</v-button
+                      >
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
-            </v-form-item>
-            <v-form-item label>
-              <v-button type="primary" @click="handleNextTabs('3')">下一步</v-button>
-            </v-form-item>
-          </v-form>
+            </v-form-model-item>
+            <v-form-model-item label=" " :colon="false">
+              <v-button type="primary" @click="handleNextTabs('3')"
+                >下一步</v-button
+              >
+            </v-form-model-item>
+          </v-form-model>
         </v-tab-pane>
         <v-tab-pane tab="响应参数设置" key="3">
-          <v-form
+          <v-form-model
             ref="formValidate3"
             :model="formValidate3"
             :rules="ruleValidateCheck3"
-            :label-width="150"
+            :label-col="labelCol"
+            :wrapper-col="wrapperCol"
           >
-            <v-form-item label="响应Header参数说明">
-              <div class="clearfix margin-bottom-5">
+            <v-form-model-item label="响应Header参数说明">
+              <div class="clearfix mb-5">
                 <v-button
                   size="small"
-                  class="editable-add-btn fr margin-left-10"
+                  class="editable-add-btn fr ml-10"
                   type="primary"
                   @click="handleClickImport('outHeader')"
-                >导入</v-button>
+                  >导入</v-button
+                >
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleRespondModal('header')"
-                >新增</v-button>
+                  >新增</v-button
+                >
               </div>
               <v-table
                 bordered
@@ -247,35 +298,50 @@
                 :columns="outcolumns"
                 :dataSource="formValidate3.headerVal"
                 :pagination="false"
-                :scroll="{y: 240 }"
+                :scroll="{ y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtRespond('header',record,index)">编辑</v-button>
-                      <v-button @click="() => handleDeleteRespond('header',record,index)">删除</v-button>
+                      <v-button
+                        @click="
+                          () => handleEidtRespond('header', record, index)
+                        "
+                        >编辑</v-button
+                      >
+                      <v-button
+                        @click="
+                          () => handleDeleteRespond('header', record, index)
+                        "
+                        >删除</v-button
+                      >
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
-            </v-form-item>
-            <v-form-item label="header响应数据">
+            </v-form-model-item>
+            <v-form-model-item label="header响应数据">
               <div id="jsoneditorHeader"></div>
-            </v-form-item>
-            <v-form-item label="响应参数说明" class="vcu-form-item-required">
-              <div class="clearfix margin-bottom-5">
+            </v-form-model-item>
+            <v-form-model-item>
+              <span slot="label" class="vcu-form-item-required">
+                响应参数说明
+              </span>
+              <div class="clearfix mb-5">
                 <v-button
                   size="small"
-                  class="editable-add-btn fr margin-left-10"
+                  class="editable-add-btn fr ml-10"
                   type="primary"
                   @click="handleClickImport('outBody')"
-                >导入</v-button>
+                  >导入</v-button
+                >
                 <v-button
                   size="small"
                   class="editable-add-btn fr"
                   type="primary"
                   @click="handleRespondModal('respond')"
-                >新增</v-button>
+                  >新增</v-button
+                >
               </div>
               <v-table
                 bordered
@@ -283,71 +349,116 @@
                 :columns="outcolumns"
                 :dataSource="formValidate3.respondVal"
                 :pagination="false"
-                :scroll="{y: 240 }"
+                :scroll="{ y: 240 }"
               >
                 <template slot="operation" slot-scope="text, record, index">
                   <div class="editable-row-operations">
                     <v-button-group size="small">
-                      <v-button @click="() => handleEidtRespond('respond',record,index)">编辑</v-button>
-                      <v-button @click="() => handleDeleteRespond('respond',record,index)">删除</v-button>
+                      <v-button
+                        @click="
+                          () => handleEidtRespond('respond', record, index)
+                        "
+                        >编辑</v-button
+                      >
+                      <v-button
+                        @click="
+                          () => handleDeleteRespond('respond', record, index)
+                        "
+                        >删除</v-button
+                      >
                     </v-button-group>
                   </div>
                 </template>
               </v-table>
               <div
                 class="vcu-form-item-error-tip"
-                v-if="formValidate3.respondVal.length==0 && roleValidate3"
-              >不能为空</div>
-            </v-form-item>
-            <v-form-item label="响应数据" class="vcu-form-item-required">
+                v-if="formValidate3.respondVal.length == 0 && roleValidate3"
+              >
+                不能为空
+              </div>
+            </v-form-model-item>
+            <v-form-model-item>
+              <span slot="label" class="vcu-form-item-required">
+                响应数据
+              </span>
               <div id="jsoneditorRespond" class></div>
               <div
                 class="vcu-form-item-error-tip"
                 v-if="respondJsonValidate && roleValidate3"
-              >不能为空,或JSON格式有错误</div>
-            </v-form-item>
-            <!-- <v-form-item label="返回状态码" prop="rcode">
+              >
+                不能为空,或JSON格式有错误
+              </div>
+            </v-form-model-item>
+            <!-- <v-form-model-item label="返回状态码" prop="rcode">
               <v-input v-model="formValidate3.rcode" style="width:200px"></v-input>
-            </v-form-item>-->
-            <v-form-item label="开启mockjs" prop="ismock">
+            </v-form-model-item>-->
+            <v-form-model-item label="开启mockjs" prop="ismock">
               <v-radio-group v-model="formValidate3.ismock">
                 <v-radio value="0">开启</v-radio>
                 <v-radio value="1">关闭</v-radio>
               </v-radio-group>
-            </v-form-item>
-            <v-form-item label="延迟返回数据" prop="lazytime">
-              <v-input-number :min="0" :max="100000" v-model="formValidate3.lazytime"></v-input-number>秒
-            </v-form-item>
-            <v-form-item label>
+            </v-form-model-item>
+            <v-form-model-item label="延迟返回数据" prop="lazytime">
+              <v-input-number
+                :min="0"
+                :max="100000"
+                v-model="formValidate3.lazytime"
+              ></v-input-number
+              >秒
+            </v-form-model-item>
+            <v-form-model-item label=" " :colon="false">
               <v-button type="primary" @click="handleSubmit">保 存</v-button>
-            </v-form-item>
-          </v-form>
+            </v-form-model-item>
+          </v-form-model>
         </v-tab-pane>
       </v-tabs>
 
-      <v-modal v-model="invisible" title="参数说明" :maskClosable="false" @cancel="handleCancelInModal">
+      <v-modal
+        v-model="invisible"
+        title="参数说明"
+        :maskClosable="false"
+        @cancel="handleCancelInModal"
+      >
         <template slot="footer">
           <v-button key="back" @click="handleCancelInModal">取消</v-button>
-          <v-button key="next" type="primary" @click="handleInModal(false)" v-if="inModalNext">下一条</v-button>
-          <v-button key="submit" type="primary" @click="handleInModal(true)">完成</v-button>
+          <v-button
+            key="next"
+            type="primary"
+            @click="handleInModal(false)"
+            v-if="inModalNext"
+            >下一条</v-button
+          >
+          <v-button key="submit" type="primary" @click="handleInModal(true)"
+            >完成</v-button
+          >
         </template>
-        <v-form ref="formInModal" :model="formInModal" :rules="ruleInModal" :label-width="60">
-          <v-form-item label="参数名" prop="name">
+        <v-form-model
+          ref="formInModal"
+          :model="formInModal"
+          :rules="ruleInModal"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <v-form-model-item label="参数名" prop="name">
             <v-input type="text" v-model="formInModal.name" />
-          </v-form-item>
-          <v-form-item label="类型" prop="type">
-            <v-select style="width: 200px" v-model="formInModal.type" :options="dataType"></v-select>
-          </v-form-item>
-          <v-form-item label="必填" prop="must">
+          </v-form-model-item>
+          <v-form-model-item label="类型" prop="type">
+            <v-select
+              style="width: 200px"
+              v-model="formInModal.type"
+              :options="dataType"
+            ></v-select>
+          </v-form-model-item>
+          <v-form-model-item label="必填" prop="must">
             <v-radio-group name="radioGroup" v-model="formInModal.must">
               <v-radio value="Yes">Yes</v-radio>
               <v-radio value="No">No</v-radio>
             </v-radio-group>
-          </v-form-item>
-          <v-form-item label="说明" prop="desc">
+          </v-form-model-item>
+          <v-form-model-item label="说明" prop="desc">
             <v-textarea :rows="6" v-model="formInModal.desc"></v-textarea>
-          </v-form-item>
-        </v-form>
+          </v-form-model-item>
+        </v-form-model>
       </v-modal>
 
       <v-modal
@@ -363,31 +474,52 @@
             type="primary"
             @click="handleRespondSubmit(false)"
             v-if="reModalNext"
-          >下一条</v-button>
-          <v-button key="submit" type="primary" @click="handleRespondSubmit(true)">完成</v-button>
+            >下一条</v-button
+          >
+          <v-button
+            key="submit"
+            type="primary"
+            @click="handleRespondSubmit(true)"
+            >完成</v-button
+          >
         </template>
-        <v-form ref="formReModal" :model="formReModal" :rules="ruleReModal" :label-width="60">
-          <v-form-item label="返回键" prop="name">
+        <v-form-model
+          ref="formReModal"
+          :model="formReModal"
+          :rules="ruleReModal"
+          :label-col="labelCol"
+          :wrapper-col="wrapperCol"
+        >
+          <v-form-model-item label="返回键" prop="name">
             <v-input type="text" v-model="formReModal.name" />
-          </v-form-item>
-          <v-form-item label="类型" prop="type">
-            <v-select style="width: 200px" v-model="formReModal.type" :options="dataType"></v-select>
-          </v-form-item>
-          <v-form-item label="返回值" prop="value">
+          </v-form-model-item>
+          <v-form-model-item label="类型" prop="type">
+            <v-select
+              style="width: 200px"
+              v-model="formReModal.type"
+              :options="dataType"
+            ></v-select>
+          </v-form-model-item>
+          <v-form-model-item label="返回值" prop="value">
             <v-input type="text" v-model="formReModal.value" />
-          </v-form-item>
-          <v-form-item label="说明" prop="desc">
+          </v-form-model-item>
+          <v-form-model-item label="说明" prop="desc">
             <v-textarea :rows="6" v-model="formReModal.desc"></v-textarea>
-          </v-form-item>
-        </v-form>
+          </v-form-model-item>
+        </v-form-model>
       </v-modal>
 
-      <v-modal v-model="visibleImport" title="导入" :maskClosable="false" @ok="handleOkImport">
+      <v-modal
+        v-model="visibleImport"
+        title="导入"
+        :maskClosable="false"
+        @ok="handleOkImport"
+      >
         <v-textarea v-model="valueImport" :rows="10" />
       </v-modal>
     </div>
-    <iframe name="myIframe" style="display:none"></iframe>
-    <input type="file" id="file" style="display:none" @change="importFile" />
+    <iframe name="myIframe" style="display: none"></iframe>
+    <input type="file" id="file" style="display: none" @change="importFile" />
   </v-spin>
 </template>
 
@@ -398,148 +530,148 @@ import jsoneditor from "jsoneditor";
 const dataType = [
   {
     label: "Int",
-    value: "Int"
+    value: "Int",
   },
   {
     label: "String",
-    value: "String"
+    value: "String",
   },
   {
     label: "JSONObject",
-    value: "JSONObject"
+    value: "JSONObject",
   },
   {
     label: "Boolean",
-    value: "Boolean"
+    value: "Boolean",
   },
   {
     label: "BigDecimal",
-    value: "BigDecimal"
+    value: "BigDecimal",
   },
   {
     label: "Array",
-    value: "Array"
+    value: "Array",
   },
   {
     label: "Float",
-    value: "Float"
+    value: "Float",
   },
   {
     label: "Double",
-    value: "Double"
+    value: "Double",
   },
   {
     label: "Char",
-    value: "Char"
-  }
+    value: "Char",
+  },
 ];
 const optionsApiType = [
   {
     label: "GET",
-    value: "0"
+    value: "0",
   },
   {
     label: "PUT",
-    value: "1"
+    value: "1",
   },
   {
     label: "POST",
-    value: "2"
+    value: "2",
   },
   {
     label: "DELETE",
-    value: "3"
+    value: "3",
   },
   {
     label: "OPTIONS",
-    value: "4"
+    value: "4",
   },
   {
     label: "PATCH",
-    value: "5"
-  }
+    value: "5",
+  },
 ];
 const incolumns = [
   {
     title: "参数名",
     dataIndex: "name",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "类型",
     dataIndex: "type",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "必填",
     dataIndex: "must",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "说明",
     dataIndex: "desc",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "操作",
     width: "20%",
     scopedSlots: { customRender: "operation" },
-    align: "center"
-  }
+    align: "center",
+  },
 ];
 const optionsApiStatus = [
   {
     label: "废弃",
-    value: "0"
+    value: "0",
   },
   {
     label: "已上线",
-    value: "1"
+    value: "1",
   },
   {
     label: "开发中",
-    value: "2"
+    value: "2",
   },
   {
     label: "测试中",
-    value: "3"
-  }
+    value: "3",
+  },
 ];
 const outcolumns = [
   {
     title: "返回键",
     dataIndex: "name",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "类型",
     dataIndex: "type",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "返回值",
     dataIndex: "value",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "说明",
     dataIndex: "desc",
     width: "20%",
-    align: "center"
+    align: "center",
   },
   {
     title: "操作",
     width: "20%",
     scopedSlots: { customRender: "operation" },
-    align: "center"
-  }
+    align: "center",
+  },
 ];
 const convertToTreeData = (data, pid) => {
   let result = [],
@@ -549,7 +681,7 @@ const convertToTreeData = (data, pid) => {
       let obj = {
         label: data[i].modulename,
         key: data[i].mid.toString(),
-        value: data[i].mid.toString()
+        value: data[i].mid.toString(),
       };
       temp = convertToTreeData(data, data[i].mid);
       if (temp.length > 0) {
@@ -561,7 +693,7 @@ const convertToTreeData = (data, pid) => {
 
   return result;
 };
-const switchTypeFun = type => {
+const switchTypeFun = (type) => {
   let _type = "";
   switch (type) {
     case "GET":
@@ -605,11 +737,11 @@ const readerDatasJson = (res, type) => {
     let item = {
       name: x,
       type: transformationType(typeof list[x]),
-      desc: ""
+      desc: "",
     };
     if (type) {
       item.must = "No";
-    }else{
+    } else {
       item.value = list[x];
     }
     json.push(item);
@@ -618,7 +750,7 @@ const readerDatasJson = (res, type) => {
   return json;
 };
 
-const transformationType = val => {
+const transformationType = (val) => {
   let value = "String";
   switch (val) {
     case "number":
@@ -639,6 +771,8 @@ const transformationType = val => {
 export default {
   data() {
     return {
+      labelCol: { span: 4 },
+      wrapperCol: { span: 18 },
       previewVisible: false,
       previewImage: "",
       fileList: [],
@@ -654,50 +788,50 @@ export default {
         apiurl: "",
         apidesc: "",
         apistatus: "2",
-        sqlsentence: ""
+        sqlsentence: "",
       },
       ruleValidate1: {
         projectid: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         moduleid: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         apitype: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         apistatus: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         apiname: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
-          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" }
+          { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
         ],
         apiurl: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
-          { pattern: /^(?!\/)/, message: "第一个字符不能为“/”" }
-        ]
+          { pattern: /^(?!\/)/, message: "第一个字符不能为“/”" },
+        ],
       },
       optionsProject: [],
       optionsModule: [],
@@ -707,7 +841,7 @@ export default {
       formValidate2: {
         headerVal: [],
         getVal: [],
-        bodyVal: []
+        bodyVal: [],
       },
       incolumns,
       inJsonHeader: [],
@@ -721,21 +855,21 @@ export default {
         respondJson: null,
         ismock: "0",
         //rcode: "200",
-        lazytime: 0
+        lazytime: 0,
       },
       ruleValidateCheck3: {
         ismock: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         lazytime: [
           {
             required: true,
-            message: "不能为空"
-          }
-        ]
+            message: "不能为空",
+          },
+        ],
         /* rcode: [
           {
             required: true,
@@ -763,7 +897,7 @@ export default {
         name: "",
         type: "",
         must: "No",
-        desc: ""
+        desc: "",
       },
       dataType,
       ruleInModal: {
@@ -771,21 +905,21 @@ export default {
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         type: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         must: [
           {
-            required: true
-          }
+            required: true,
+          },
         ],
-        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }]
+        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }],
       },
 
       reModalType: "",
@@ -796,37 +930,37 @@ export default {
         name: "",
         type: "",
         value: "",
-        desc: ""
+        desc: "",
       },
       ruleReModal: {
         name: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
-          }
+            trigger: "blur",
+          },
         ],
         type: [
           {
             required: true,
-            message: "不能为空"
-          }
+            message: "不能为空",
+          },
         ],
         value: [
           {
             required: true,
             message: "不能为空",
-            trigger: "blur"
+            trigger: "blur",
           },
           { pattern: /^(?!(\s+$))/, message: "不可为纯空格" },
-          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }
+          { pattern: /^(?!(\'+$))/, message: "不可以使用单引号" },
         ],
-        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }]
+        desc: [{ pattern: /^(?!(\'+$))/, message: "不可以使用单引号" }],
       },
 
       typeImport: "",
       visibleImport: false,
-      valueImport: ""
+      valueImport: "",
     };
   },
   computed: {
@@ -844,7 +978,7 @@ export default {
     },
     addmoduleid() {
       return this.$route.query.mid;
-    }
+    },
   },
   mounted() {
     this.init();
@@ -876,7 +1010,7 @@ export default {
     async getMockIdData() {
       let res = await this.$request({
         method: "GET",
-        url: `/interfaces/mockid/${this.$route.query.id}`
+        url: `/interfaces/mockid/${this.$route.query.id}`,
       });
       return res.data;
     },
@@ -913,7 +1047,7 @@ export default {
     async getProject() {
       let res = await this.$request({
         method: "GET",
-        url: `/projects/all`
+        url: `/projects/all`,
       });
       return res.data;
     },
@@ -921,7 +1055,7 @@ export default {
     async getModule(id) {
       let res = await this.$request({
         method: "GET",
-        url: `/modules/all/${id}`
+        url: `/modules/all/${id}`,
       });
       return res.data;
     },
@@ -934,9 +1068,9 @@ export default {
           content: "还没有项目或模块是否添加",
           onOk() {
             _this.$router.push({
-              name: "project_index"
+              name: "project_index",
             });
-          }
+          },
         });
         return false;
       }
@@ -949,15 +1083,15 @@ export default {
       let containerRespond = document.getElementById("jsoneditorRespond");
       let optionsHeader = {
         modes: ["code", "form", "text", "tree", "view", "preview"],
-        onValidationError: function(errors) {
+        onValidationError: function (errors) {
           _this.errorsHeader = errors;
-        }
+        },
       };
       let optionsRespond = {
         modes: ["code", "form", "text", "tree", "view", "preview"],
-        onValidationError: function(errors) {
+        onValidationError: function (errors) {
           _this.errorsRespond = errors;
-        }
+        },
       };
       this.jsoneditorHeader = new jsoneditor(containerHeader, optionsHeader);
       this.jsoneditorRespond = new jsoneditor(containerRespond, optionsRespond);
@@ -1017,7 +1151,7 @@ export default {
       if (this.errorsHeader.length != 0) {
         this.$error({
           title: "header响应数据错误",
-          content: this.errorsHeader[0].message
+          content: this.errorsHeader[0].message,
         });
         return false;
       } else {
@@ -1031,7 +1165,7 @@ export default {
       if (this.errorsRespond.length != 0) {
         this.$error({
           title: "响应数据错误",
-          content: this.errorsRespond[0].message
+          content: this.errorsRespond[0].message,
         });
         return false;
       } else {
@@ -1054,7 +1188,7 @@ export default {
         } catch (error) {
           this.$error({
             title: "响应数据错误",
-            content: "请认真检查，注意不能为空"
+            content: "请认真检查，注意不能为空",
           });
           return false;
         }
@@ -1087,13 +1221,13 @@ export default {
     },
     //响应参数下一步、完成窗口
     handleRespondSubmit(b) {
-      this.$refs["formReModal"].validate(valid => {
+      this.$refs["formReModal"].validate((valid) => {
         if (valid) {
           let _data = {
             name: this.formReModal.name,
             type: this.formReModal.type,
             value: Util.replaceQuotes(this.formReModal.value),
-            desc: Util.replaceQuotes(this.formReModal.desc)
+            desc: Util.replaceQuotes(this.formReModal.desc),
           };
           if (this.reModalNext) {
             switch (this.reModalType) {
@@ -1175,13 +1309,13 @@ export default {
     },
     //入参下一步、完成窗口
     handleInModal(b) {
-      this.$refs["formInModal"].validate(valid => {
+      this.$refs["formInModal"].validate((valid) => {
         if (valid) {
           let _data = {
             name: this.formInModal.name,
             type: this.formInModal.type,
             must: this.formInModal.must,
-            desc: Util.replaceQuotes(this.formInModal.desc)
+            desc: Util.replaceQuotes(this.formInModal.desc),
           };
           if (this.inModalNext) {
             switch (this.inModalType) {
@@ -1276,12 +1410,12 @@ export default {
     },
     saveResult() {
       const fileList = this.fileList
-        .map(item => {
+        .map((item) => {
           if (item.status == "done") {
             return item.response;
           }
         })
-        .filter(item => {
+        .filter((item) => {
           return item != undefined;
         });
       let data = {
@@ -1306,7 +1440,7 @@ export default {
         apireqheaderdesc: JSON.stringify(this.formValidate3.headerVal),
         //rcode: this.formValidate3.rcode,
         apilazytime: this.formValidate3.lazytime,
-        fileList
+        fileList,
       };
       let method = "POST";
       let url = `/interfaces`;
@@ -1321,25 +1455,25 @@ export default {
       this.$request({
         method,
         url,
-        data
+        data,
       })
-        .then(res => {
+        .then((res) => {
           if (res.code == 200) {
             this.$router.push({
               name: "interface_success",
               query: {
-                mockid: res.data.insertId
-              }
+                mockid: res.data.insertId,
+              },
             });
           } else {
             this.$error({
               title: "错误",
-              content: res.message
+              content: res.message,
             });
           }
           this.spinning = false;
         })
-        .catch(err => {
+        .catch((err) => {
           this.spinning = false;
         });
       /* console.info(this.formValidate1);
@@ -1370,12 +1504,12 @@ export default {
         this.formValidate1.apidesc = data[0][0]["接口描述"];
         this.formValidate1.sqlsentence = data[0][0]["语句"];
         /* 响应参数说明 */
-        this.formValidate3.respondVal = data[1].map(item => {
+        this.formValidate3.respondVal = data[1].map((item) => {
           let _data = {
             name: item["返回键"],
             type: item["类型"],
             value: Util.replaceQuotes(item["返回值"]),
-            desc: Util.replaceQuotes(item["说明"])
+            desc: Util.replaceQuotes(item["说明"]),
           };
           return _data;
         });
@@ -1390,12 +1524,12 @@ export default {
         this.formValidate3.headerVal =
           data[3].length == 0
             ? []
-            : data[3].map(item => {
+            : data[3].map((item) => {
                 return {
                   name: item["返回键"],
                   type: item["类型"],
                   value: Util.replaceQuotes(item["返回值"]),
-                  desc: Util.replaceQuotes(item["说明"])
+                  desc: Util.replaceQuotes(item["说明"]),
                 };
               });
         /* 响应Header数据 */
@@ -1416,36 +1550,36 @@ export default {
         this.formValidate2.headerVal =
           data[5].length == 0
             ? []
-            : data[5].map(item => {
+            : data[5].map((item) => {
                 return {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: Util.replaceQuotes(item["说明"])
+                  desc: Util.replaceQuotes(item["说明"]),
                 };
               });
         /* Get参数说明 */
         this.formValidate2.getVal =
           data[6].length == 0
             ? []
-            : data[6].map(item => {
+            : data[6].map((item) => {
                 return {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: Util.replaceQuotes(item["说明"])
+                  desc: Util.replaceQuotes(item["说明"]),
                 };
               });
         /* body参数说明 */
         this.formValidate2.bodyVal =
           data[7].length == 0
             ? []
-            : data[7].map(item => {
+            : data[7].map((item) => {
                 return {
                   name: item["参数名"],
                   type: item["类型"],
                   must: item["必填"],
-                  desc: Util.replaceQuotes(item["说明"])
+                  desc: Util.replaceQuotes(item["说明"]),
                 };
               });
       } catch (error) {
@@ -1461,9 +1595,9 @@ export default {
         method: "POST",
         url: "/uploadFile/delete",
         data: {
-          id: file.fileid
-        }
-      }).then(res => {
+          id: file.fileid,
+        },
+      }).then((res) => {
         if (res) {
           this.$message.success(res.message);
         }
@@ -1523,12 +1657,12 @@ export default {
           this.formValidate3.respondVal = readerDatasJson(_valueImport, false);
           break;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 <style lang="less">
-@import url("jsoneditor/dist/jsoneditor.min.css");
+@import "~jsoneditor/dist/jsoneditor.min.css";
 .card-container {
   .vcu-tabs-card {
     .vcu-tabs-content {
